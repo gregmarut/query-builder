@@ -7,6 +7,7 @@
 	<packaging>pom</packaging>
 	<modules>
 		<module>query-builder-core</module>
+		<module>query-builder-jpa</module>
 	</modules>
 
 	<dependencies>
