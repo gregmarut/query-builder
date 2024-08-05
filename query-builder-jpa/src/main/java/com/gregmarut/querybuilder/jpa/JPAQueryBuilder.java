@@ -23,6 +23,7 @@
 package com.gregmarut.querybuilder.jpa;
 
 import com.gregmarut.querybuilder.QueryBuilder;
+import jakarta.persistence.metamodel.Attribute;
 import lombok.NonNull;
 
 import javax.annotation.Nullable;
@@ -108,7 +109,7 @@ public abstract class JPAQueryBuilder<B extends JPAQueryBuilder<B, E>, E> extend
 		throw new IllegalArgumentException("alias " + alias + " is not defined");
 	}
 	
-	protected Set<JPAJoin> buildFetchSet()
+	protected Set<Attribute<? super E, ?>> buildFetchSet()
 	{
 		return Set.of();
 	}

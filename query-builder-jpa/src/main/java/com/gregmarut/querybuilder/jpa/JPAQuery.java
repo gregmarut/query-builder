@@ -41,6 +41,8 @@ import com.gregmarut.querybuilder.predicate.NotNullPredicate;
 import com.gregmarut.querybuilder.predicate.NullPredicate;
 import com.gregmarut.querybuilder.predicate.OrPredicate;
 import com.gregmarut.querybuilder.predicate.Predicate;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.From;
@@ -48,6 +50,7 @@ import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Root;
+import jakarta.persistence.metamodel.Attribute;
 
 import java.time.Instant;
 import java.util.Arrays;
@@ -58,14 +61,16 @@ import java.util.Set;
 
 public class JPAQuery<E>
 {
+	private static final String HINT_FETCH_GRAPH = "jakarta.persistence.fetchgraph";
+	
 	private final Class<E> entityClass;
 	private final Map<String, JPAJoin> joinMap;
-	private final Set<JPAJoin> fetchSet;
+	private final Set<Attribute<? super E, ?>> fetchSet;
 	private final List<Predicate> predicates;
 	private final List<Sort> sortList;
 	
-	public JPAQuery(final Class<E> entityClass, final List<Predicate> predicates, final List<Sort> sortList, final Set<JPAJoin> fetchSet,
-		final Map<String, JPAJoin> joinMap)
+	public JPAQuery(final Class<E> entityClass, final List<Predicate> predicates, final List<Sort> sortList,
+		final Set<Attribute<? super E, ?>> fetchSet, final Map<String, JPAJoin> joinMap)
 	{
 		this.entityClass = entityClass;
 		this.joinMap = joinMap;
@@ -77,11 +82,12 @@ public class JPAQuery<E>
 	/**
 	 * Builds the {@link CriteriaQuery} to return the results of the query
 	 *
-	 * @param criteriaBuilder
+	 * @param entityManager
 	 * @return
 	 */
-	public CriteriaQuery<E> buildCriteriaQuery(final CriteriaBuilder criteriaBuilder)
+	public TypedQuery<E> buildCriteriaQuery(final EntityManager entityManager)
 	{
+		final CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
 		final CriteriaQuery<E> query = criteriaBuilder.createQuery(entityClass);
 		final Root<E> root = query.from(entityClass);
 		
@@ -91,9 +97,6 @@ public class JPAQuery<E>
 		
 		//build the joins for the query
 		buildJoins(fromMap, criteriaBuilder);
-		
-		//build the fetches
-		buildFetches(fromMap);
 		
 		//build the predicates for this search
 		final List<jakarta.persistence.criteria.Predicate> predicates = buildJPAPredicates(criteriaBuilder, fromMap);
@@ -108,18 +111,24 @@ public class JPAQuery<E>
 			query.orderBy(sortList.stream().map(sort -> toOrder(criteriaBuilder, fromMap, sort)).toList());
 		}
 		
-		return query;
+		final var typedQuery = entityManager.createQuery(query);
+		
+		//build the fetches
+		buildFetches(typedQuery, entityManager);
+		
+		return typedQuery;
 	}
 	
 	/**
 	 * Builds a query that returns count of all of the results matching the query
 	 *
-	 * @param criteriaBuilder
+	 * @param entityManager
 	 * @return
 	 */
-	public CriteriaQuery<Long> buildCountQuery(final CriteriaBuilder criteriaBuilder)
+	public TypedQuery<Long> buildCountQuery(final EntityManager entityManager)
 	{
 		//create the query that will count the total results
+		final CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
 		final CriteriaQuery<Long> countQuery = criteriaBuilder.createQuery(Long.class);
 		final Root<E> root = countQuery.from(entityClass);
 		
@@ -140,7 +149,7 @@ public class JPAQuery<E>
 			countQuery.where(predicates.toArray(jakarta.persistence.criteria.Predicate[]::new));
 		}
 		
-		return countQuery;
+		return entityManager.createQuery(countQuery);
 	}
 	
 	/**
@@ -189,19 +198,16 @@ public class JPAQuery<E>
 			});
 	}
 	
-	private void buildFetches(final Map<String, From<?, ?>> fromMap)
+	private void buildFetches(final TypedQuery<E> typedQuery, final EntityManager entityManager)
 	{
-		//for each of the fetches
-		for (final var fetch : fetchSet)
+		//check to see if there are any fetches to add
+		if (!fetchSet.isEmpty())
 		{
-			//find the from object for this join
-			final var from = fromMap.get(fetch.getFrom());
-			if (null == from)
-			{
-				throw new IllegalStateException("Unable to find the from object for join: " + fetch.getFrom());
-			}
+			final var graph = entityManager.createEntityGraph(entityClass);
+			final Attribute<? super E, ?>[] attributes = fetchSet.toArray(new Attribute[0]);
+			graph.addAttributeNodes(attributes);
 			
-			from.fetch(fetch.getColumn(), fetch.getJoinType());
+			typedQuery.setHint(HINT_FETCH_GRAPH, graph);
 		}
 	}
 	

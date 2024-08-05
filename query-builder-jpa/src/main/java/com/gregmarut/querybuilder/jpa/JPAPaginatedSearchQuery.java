@@ -24,6 +24,9 @@ package com.gregmarut.querybuilder.jpa;
 
 import com.gregmarut.querybuilder.Sort;
 import com.gregmarut.querybuilder.predicate.Predicate;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.metamodel.Attribute;
 import lombok.Getter;
 
 import java.util.List;
@@ -39,10 +42,22 @@ public final class JPAPaginatedSearchQuery<E> extends JPAQuery<E>
 	private final int pageSize;
 	
 	public JPAPaginatedSearchQuery(final Class<E> entityClass, final List<Predicate> predicates, final List<Sort> sortList,
-		final Set<JPAJoin> fetchSet, final Map<String, JPAJoin> joinMap, final int pageIndex, final int pageSize)
+		final Set<Attribute<? super E, ?>> fetchSet, final Map<String, JPAJoin> joinMap, final int pageIndex, final int pageSize)
 	{
 		super(entityClass, predicates, sortList, fetchSet, joinMap);
 		this.pageIndex = pageIndex;
 		this.pageSize = pageSize;
+	}
+	
+	@Override
+	public TypedQuery<E> buildCriteriaQuery(final EntityManager entityManager)
+	{
+		final var typedQuery = super.buildCriteriaQuery(entityManager);
+		
+		//apply the pagination restrictions
+		typedQuery.setFirstResult(pageIndex * pageSize);
+		typedQuery.setMaxResults(pageSize);
+		
+		return typedQuery;
 	}
 }

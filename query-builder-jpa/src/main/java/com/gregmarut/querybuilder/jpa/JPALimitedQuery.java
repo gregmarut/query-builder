@@ -24,6 +24,9 @@ package com.gregmarut.querybuilder.jpa;
 
 import com.gregmarut.querybuilder.Sort;
 import com.gregmarut.querybuilder.predicate.Predicate;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.metamodel.Attribute;
 import lombok.Getter;
 
 import java.util.List;
@@ -36,10 +39,21 @@ public class JPALimitedQuery<E> extends JPAQuery<E>
 	private final int limit;
 	
 	public JPALimitedQuery(final Class<E> entityClass, final List<Predicate> predicates, final List<Sort> sortList,
-		final Set<JPAJoin> fetchSet, final Map<String, JPAJoin> joinMap, final int limit)
+		final Set<Attribute<? super E, ?>> fetchSet, final Map<String, JPAJoin> joinMap, final int limit)
 	{
 		super(entityClass, predicates, sortList, fetchSet, joinMap);
 		
 		this.limit = limit;
+	}
+	
+	@Override
+	public TypedQuery<E> buildCriteriaQuery(final EntityManager entityManager)
+	{
+		final var typedQuery = super.buildCriteriaQuery(entityManager);
+		
+		//set the max results
+		typedQuery.setMaxResults(limit);
+		
+		return typedQuery;
 	}
 }
