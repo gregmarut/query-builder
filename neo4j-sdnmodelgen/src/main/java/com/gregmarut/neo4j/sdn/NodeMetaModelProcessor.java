@@ -37,7 +37,7 @@ import java.io.Writer;
 import java.util.Set;
 
 @SupportedAnnotationTypes("org.springframework.data.neo4j.core.schema.Node")
-@SupportedSourceVersion(SourceVersion.RELEASE_21)
+@SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class NodeMetaModelProcessor extends AbstractProcessor
 {
 	@Override
