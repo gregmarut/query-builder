@@ -13,6 +13,7 @@
 		<module>query-builder-core</module>
 		<module>query-builder-jpa</module>
 		<module>query-builder-mongodb</module>
+		<module>neo4j-sdnmodelgen</module>
 	</modules>
 
 	<licenses>
