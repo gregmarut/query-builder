@@ -70,16 +70,28 @@ public class NodeMetaModelProcessor extends AbstractProcessor
 		{
 			writer.write("package " + packageName + ";\n");
 			writer.write("public class " + className + " {\n");
-			for (Element enclosed : node.getEnclosedElements())
-			{
-				if (enclosed.getKind() == ElementKind.FIELD)
-				{
-					writer.write(
-						"    public static final String " + toUpperSnakeCase(enclosed.getSimpleName().toString()) +
-						" = \"" + enclosed.getSimpleName() + "\";\n");
-				}
-			}
+			processFields(node, writer);
 			writer.write("}\n");
+		}
+	}
+	
+	private void processFields(TypeElement node, Writer writer) throws IOException
+	{
+		// Process superclass fields
+		TypeElement superclass = (TypeElement) processingEnv.getTypeUtils().asElement(node.getSuperclass());
+		if (superclass != null && !superclass.getQualifiedName().toString().equals(Object.class.getName()))
+		{
+			processFields(superclass, writer);
+		}
+		
+		for (Element enclosed : node.getEnclosedElements())
+		{
+			if (enclosed.getKind() == ElementKind.FIELD)
+			{
+				writer.write(
+					"    public static final String " + toUpperSnakeCase(enclosed.getSimpleName().toString()) +
+					" = \"" + enclosed.getSimpleName() + "\";\n");
+			}
 		}
 	}
 	
