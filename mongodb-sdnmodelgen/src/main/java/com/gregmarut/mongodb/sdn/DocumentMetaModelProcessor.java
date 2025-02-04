@@ -34,6 +34,7 @@ import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 
 @SupportedAnnotationTypes("org.springframework.data.mongodb.core.mapping.Document")
@@ -86,11 +87,11 @@ public class DocumentMetaModelProcessor extends AbstractProcessor
 		
 		for (Element enclosed : node.getEnclosedElements())
 		{
-			if (enclosed.getKind() == ElementKind.FIELD)
+			if (enclosed.getKind() == ElementKind.FIELD && !enclosed.getModifiers().contains(Modifier.STATIC))
 			{
 				writer.write(
 					"    public static final String " + toUpperSnakeCase(enclosed.getSimpleName().toString()) +
-					" = \"" + enclosed.getSimpleName() + "\";\n");
+						" = \"" + enclosed.getSimpleName() + "\";\n");
 			}
 		}
 	}

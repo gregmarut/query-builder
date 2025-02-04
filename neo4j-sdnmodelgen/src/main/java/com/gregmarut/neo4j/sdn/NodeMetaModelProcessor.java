@@ -24,6 +24,9 @@ package com.gregmarut.neo4j.sdn;
 
 import org.springframework.data.neo4j.core.schema.Node;
 
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Set;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
@@ -31,10 +34,8 @@ import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
-import java.io.IOException;
-import java.io.Writer;
-import java.util.Set;
 
 @SupportedAnnotationTypes("org.springframework.data.neo4j.core.schema.Node")
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
@@ -86,11 +87,11 @@ public class NodeMetaModelProcessor extends AbstractProcessor
 		
 		for (Element enclosed : node.getEnclosedElements())
 		{
-			if (enclosed.getKind() == ElementKind.FIELD)
+			if (enclosed.getKind() == ElementKind.FIELD && !enclosed.getModifiers().contains(Modifier.STATIC))
 			{
 				writer.write(
 					"    public static final String " + toUpperSnakeCase(enclosed.getSimpleName().toString()) +
-					" = \"" + enclosed.getSimpleName() + "\";\n");
+						" = \"" + enclosed.getSimpleName() + "\";\n");
 			}
 		}
 	}
