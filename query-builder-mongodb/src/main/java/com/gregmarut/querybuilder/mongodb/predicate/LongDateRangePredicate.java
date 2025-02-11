@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Greg Marut
+ * Copyright 2025 Greg Marut
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,15 +20,14 @@
  * THE SOFTWARE.
  */
 
-package com.gregmarut.querybuilder.predicate;
+package com.gregmarut.querybuilder.mongodb.predicate;
 
 import com.gregmarut.querybuilder.DateRange;
+import com.gregmarut.querybuilder.predicate.ValuePredicate;
 
-import java.time.Instant;
-
-public class DateRangePredicate extends ValuePredicate<DateRange<Instant>>
+public class LongDateRangePredicate extends ValuePredicate<DateRange<Long>>
 {
-	public DateRangePredicate(final DateRange<Instant> value, final String root, final String... path)
+	public LongDateRangePredicate(final DateRange<Long> value, final String root, final String... path)
 	{
 		super(value, root, path);
 	}

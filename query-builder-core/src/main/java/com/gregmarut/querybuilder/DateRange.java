@@ -24,9 +24,9 @@ package com.gregmarut.querybuilder;
 
 import org.apache.commons.lang3.ObjectUtils;
 
-import javax.annotation.Nullable;
 import java.time.Instant;
 import java.util.Optional;
+import javax.annotation.Nullable;
 
 /**
  * Represents a range of dates, before and after. Either before or after can be null to represent an open ended range.
@@ -35,37 +35,29 @@ import java.util.Optional;
  * @param after
  * @param before
  */
-public record DateRange(@Nullable Instant after, @Nullable Instant before)
+public record DateRange<T>(@Nullable T after, @Nullable T before)
 {
-	public static DateRange after(@Nullable final Instant after)
+	public static <T> DateRange<T> after(@Nullable final T after)
 	{
-		return new DateRange(after, null);
+		return new DateRange<>(after, null);
 	}
 	
-	public static DateRange before(@Nullable final Instant before)
+	public static <T> DateRange<T> before(@Nullable final T before)
 	{
-		return new DateRange(null, before);
-	}
-	
-	@Nullable
-	public static DateRange between(@Nullable final Instant after, @Nullable final Instant before)
-	{
-		return ObjectUtils.anyNotNull(after, before) ? new DateRange(after, before) : null;
+		return new DateRange<>(null, before);
 	}
 	
 	@Nullable
-	public static DateRange betweenMillis(@Nullable final Long after, @Nullable final Long before)
+	public static <T> DateRange<T> between(@Nullable final T after, @Nullable final T before)
 	{
-		if (ObjectUtils.anyNotNull(after, before))
-		{
-			return new DateRange(
-				Optional.ofNullable(after).map(Instant::ofEpochMilli).orElse(null),
-				Optional.ofNullable(before).map(Instant::ofEpochMilli).orElse(null)
-			);
-		}
-		else
-		{
-			return null;
-		}
+		return ObjectUtils.anyNotNull(after, before) ? new DateRange<T>(after, before) : null;
+	}
+	
+	public static DateRange<Long> convertToLongDateRange(final DateRange<Instant> dateRange)
+	{
+		return new DateRange<>(
+			Optional.ofNullable(dateRange.after()).map(Instant::toEpochMilli).orElse(null),
+			Optional.ofNullable(dateRange.before()).map(Instant::toEpochMilli).orElse(null)
+		);
 	}
 }

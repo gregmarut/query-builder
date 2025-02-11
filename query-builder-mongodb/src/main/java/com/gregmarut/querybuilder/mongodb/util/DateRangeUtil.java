@@ -37,23 +37,23 @@ public class DateRangeUtil
 	 * @return The Criteria object representing the DateRange query.
 	 * @throws IllegalArgumentException if the DateRange object is invalid.
 	 */
-	public static Criteria toCriteria(final DateRange dateRange, final String field)
+	public static Criteria toCriteria(final DateRange<?> dateRange, final String field)
 	{
-		final var before = Optional.ofNullable(dateRange).map(DateRange::before).orElse(null);
-		final var after = Optional.ofNullable(dateRange).map(DateRange::after).orElse(null);
+		final var before = Optional.ofNullable(dateRange).map(dr -> dr.before()).orElse(null);
+		final var after = Optional.ofNullable(dateRange).map(dr -> dr.after()).orElse(null);
 		
 		///check to see if there is a before timestamp
 		if (null != before && null != after)
 		{
-			return Criteria.where(field).lt(before.toEpochMilli()).gte(after.toEpochMilli());
+			return Criteria.where(field).lt(before).gte(after);
 		}
 		else if (null != before)
 		{
-			return Criteria.where(field).lt(before.toEpochMilli());
+			return Criteria.where(field).lt(before);
 		}
 		else if (null != after)
 		{
-			return Criteria.where(field).gte(after.toEpochMilli());
+			return Criteria.where(field).gte(after);
 		}
 		else
 		{

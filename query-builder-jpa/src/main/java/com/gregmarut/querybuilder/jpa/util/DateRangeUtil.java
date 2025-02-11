@@ -23,10 +23,10 @@
 package com.gregmarut.querybuilder.jpa.util;
 
 import com.gregmarut.querybuilder.DateRange;
+
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Path;
 import jakarta.persistence.criteria.Predicate;
-
 import java.time.Instant;
 import java.util.Optional;
 
@@ -41,10 +41,10 @@ public class DateRangeUtil
 	 * @return the Predicate criteria representing the date range search
 	 * @throws IllegalArgumentException if the dateRange is invalid or null
 	 */
-	public static Predicate toCriteria(final DateRange dateRange, final Path<Instant> field, final CriteriaBuilder criteriaBuilder)
+	public static Predicate toCriteria(final DateRange<Instant> dateRange, final Path<Instant> field, final CriteriaBuilder criteriaBuilder)
 	{
-		final var before = Optional.ofNullable(dateRange).map(DateRange::before).orElse(null);
-		final var after = Optional.ofNullable(dateRange).map(DateRange::after).orElse(null);
+		final var before = Optional.ofNullable(dateRange).map(dr -> dr.before()).orElse(null);
+		final var after = Optional.ofNullable(dateRange).map(dr -> dr.after()).orElse(null);
 		
 		///check to see if there is a before timestamp
 		if (null != before && null != after)

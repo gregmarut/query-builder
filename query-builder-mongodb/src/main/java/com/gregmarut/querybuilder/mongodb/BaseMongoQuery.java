@@ -25,6 +25,7 @@ package com.gregmarut.querybuilder.mongodb;
 import com.gregmarut.querybuilder.Expression;
 import com.gregmarut.querybuilder.Path;
 import com.gregmarut.querybuilder.Sort;
+import com.gregmarut.querybuilder.mongodb.predicate.LongDateRangePredicate;
 import com.gregmarut.querybuilder.mongodb.util.DateRangeUtil;
 import com.gregmarut.querybuilder.predicate.AndPredicate;
 import com.gregmarut.querybuilder.predicate.DateRangePredicate;
@@ -136,6 +137,11 @@ public abstract class BaseMongoQuery
 			return Criteria.where(path).regex(p.getValue());
 		}
 		else if (predicate instanceof DateRangePredicate p)
+		{
+			final var path = joinPath(p.getPath());
+			return DateRangeUtil.toCriteria(p.getValue(), path);
+		}
+		else if (predicate instanceof LongDateRangePredicate p)
 		{
 			final var path = joinPath(p.getPath());
 			return DateRangeUtil.toCriteria(p.getValue(), path);
