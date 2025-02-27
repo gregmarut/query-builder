@@ -23,9 +23,11 @@
 package com.gregmarut.mongodb.sdn;
 
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Optional;
 import java.util.Set;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.RoundEnvironment;
@@ -89,9 +91,14 @@ public class DocumentMetaModelProcessor extends AbstractProcessor
 		{
 			if (enclosed.getKind() == ElementKind.FIELD && !enclosed.getModifiers().contains(Modifier.STATIC))
 			{
+				//set the fieldname to the value of the @Field annotation if it exists, otherwise use the field name as is
+				final String fieldName =
+					Optional.ofNullable(enclosed.getAnnotation(Field.class))
+						.map(Field::value)
+						.orElseGet(() -> enclosed.getSimpleName().toString());
 				writer.write(
 					"    public static final String " + toUpperSnakeCase(enclosed.getSimpleName().toString()) +
-						" = \"" + enclosed.getSimpleName() + "\";\n");
+						" = \"" + fieldName + "\";\n");
 			}
 		}
 	}
