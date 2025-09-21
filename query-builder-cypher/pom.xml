@@ -9,7 +9,7 @@
 		<version>1.0.5</version>
 	</parent>
 
-	<artifactId>query-builder-core</artifactId>
+	<artifactId>query-builder-cypher</artifactId>
 
 	<properties>
 		<maven.compiler.source>21</maven.compiler.source>

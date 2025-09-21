@@ -15,7 +15,8 @@
         <module>query-builder-mongodb</module>
         <module>neo4j-sdnmodelgen</module>
         <module>mongodb-sdnmodelgen</module>
-    </modules>
+		<module>query-builder-cypher</module>
+	</modules>
 
     <licenses>
         <license>
