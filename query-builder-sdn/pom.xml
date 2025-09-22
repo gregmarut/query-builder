@@ -9,6 +9,7 @@
 		<version>1.0.6</version>
 	</parent>
 
+	<name>Query Builder SDN</name>
 	<artifactId>query-builder-sdn</artifactId>
 
 	<properties>

@@ -30,6 +30,8 @@
 		<artifactId>query-builder</artifactId>
 		<version>1.0.6</version>
 	</parent>
+
+	<name>Query Builder Neo4j SDN Model Gen</name>
 	<artifactId>neo4j-sdnmodelgen</artifactId>
 
 	<properties>
