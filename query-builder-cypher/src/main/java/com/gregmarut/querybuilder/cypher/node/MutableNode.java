@@ -62,7 +62,7 @@ public class MutableNode<N> extends LabeledNode<N>
 	
 	public MutableNode<N> named(final IdentifierGenerator generator)
 	{
-		this.identifier = generator.next();
+		this.identifier = generator.unique(getLabel());
 		return this;
 	}
 	

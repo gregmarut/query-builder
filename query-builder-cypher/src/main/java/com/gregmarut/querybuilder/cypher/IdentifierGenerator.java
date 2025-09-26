@@ -22,19 +22,50 @@
 
 package com.gregmarut.querybuilder.cypher;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class IdentifierGenerator
 {
 	private final AtomicInteger counter;
+	private final Set<String> identifiers;
 	
 	public IdentifierGenerator()
 	{
 		this.counter = new AtomicInteger();
+		this.identifiers = new HashSet<>();
 	}
 	
 	public String next()
 	{
 		return "_i_" + counter.incrementAndGet();
+	}
+	
+	public String unique(final String label)
+	{
+		final String lowercaseLabel = label.toLowerCase();
+		
+		//try increasing prefix length until full label is used
+		for (int length = 1; length <= lowercaseLabel.length(); length++)
+		{
+			String candidate = lowercaseLabel.substring(0, length);
+			if (!identifiers.contains(candidate))
+			{
+				identifiers.add(candidate);
+				return candidate;
+			}
+		}
+		
+		//if the full label is taken, append numbers until unique identifier is found
+		for (int suffix = 1; ; suffix++)
+		{
+			String candidate = lowercaseLabel + suffix;
+			if (!identifiers.contains(candidate))
+			{
+				identifiers.add(candidate);
+				return candidate;
+			}
+		}
 	}
 }

@@ -133,7 +133,7 @@ public class Relationship extends ReturnableCypherString implements Identifiable
 	
 	public Relationship named(final IdentifierGenerator generator)
 	{
-		this.identifier = generator.next();
+		this.identifier = generator.unique(getRelationshipType());
 		return this;
 	}
 	
