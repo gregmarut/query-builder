@@ -36,5 +36,13 @@
 			<artifactId>byte-buddy</artifactId>
 			<version>1.15.11</version>
 		</dependency>
+
+		<!-- Testing -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<version>5.14.0</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 </project>
