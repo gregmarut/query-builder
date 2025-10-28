@@ -9,20 +9,20 @@
 		<version>1.0.8</version>
 	</parent>
 
-	<name>Query Builder Core</name>
-	<artifactId>query-builder-core</artifactId>
+	<name>MongoDB Model Generator</name>
+	<artifactId>mongodb-modelgen</artifactId>
 
 	<properties>
-		<maven.compiler.source>21</maven.compiler.source>
-		<maven.compiler.target>21</maven.compiler.target>
+		<maven.compiler.source>8</maven.compiler.source>
+		<maven.compiler.target>8</maven.compiler.target>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
 	<dependencies>
 		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-			<version>3.17.0</version>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-mongodb</artifactId>
+			<version>4.5.3</version>
 		</dependency>
 	</dependencies>
 </project>
