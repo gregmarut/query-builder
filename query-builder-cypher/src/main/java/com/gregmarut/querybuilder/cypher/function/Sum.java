@@ -33,7 +33,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class Sum extends AliasableCypherString<Sum>
 {
-	private static final String SUM = "SUM";
+	private static final String SUM = "sum";
 	
 	private final CypherString cypherString;
 	

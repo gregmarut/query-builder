@@ -34,7 +34,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class Duration extends AliasableCypherString<Duration>
 {
-	private static final String DURATION = "DURATION";
+	private static final String DURATION = "duration";
 	
 	private final Map<Unit, CypherString> map;
 	

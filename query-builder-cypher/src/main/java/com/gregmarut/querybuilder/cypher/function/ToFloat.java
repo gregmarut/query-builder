@@ -33,7 +33,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class ToFloat extends AliasableCypherString<ToFloat>
 {
-	private static final String KEYWORD_TO_UPPER = "TOFLOAT";
+	private static final String KEYWORD_TO_UPPER = "tofloat";
 	
 	private final CypherString cypherString;
 	

@@ -33,7 +33,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class Range extends AliasableCypherString<Range>
 {
-	private static final String RANGE = "RANGE";
+	private static final String RANGE = "range";
 	
 	private final CypherString cypherString1;
 	private final CypherString cypherString2;

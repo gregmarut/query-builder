@@ -35,7 +35,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class Coalesce extends AliasableCypherString<Coalesce>
 {
-	private static final String KEYWORD_MAX = "COALESCE";
+	private static final String KEYWORD_MAX = "coalesce";
 	
 	private final CypherString cypherString;
 	private final CypherString defaultValue;

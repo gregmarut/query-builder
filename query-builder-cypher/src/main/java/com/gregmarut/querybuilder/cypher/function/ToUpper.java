@@ -33,7 +33,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class ToUpper extends AliasableCypherString<ToUpper>
 {
-	private static final String KEYWORD_TO_UPPER = "TOUPPER";
+	private static final String KEYWORD_TO_UPPER = "toupper";
 	
 	private final CypherString cypherString;
 	

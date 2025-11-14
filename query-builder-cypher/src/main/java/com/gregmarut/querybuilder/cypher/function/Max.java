@@ -33,7 +33,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class Max extends AliasableCypherString<Max>
 {
-	private static final String KEYWORD_MAX = "MAX";
+	private static final String KEYWORD_MAX = "max";
 	
 	private final CypherString cypherString;
 	

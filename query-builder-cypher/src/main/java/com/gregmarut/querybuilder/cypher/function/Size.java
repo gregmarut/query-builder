@@ -33,7 +33,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class Size extends AliasableCypherString<Size>
 {
-	private static final String KEYWORD_SIZE = "SIZE";
+	private static final String KEYWORD_SIZE = "size";
 	
 	private final CypherString cypherString;
 	

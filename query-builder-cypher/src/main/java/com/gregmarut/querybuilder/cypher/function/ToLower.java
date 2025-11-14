@@ -33,7 +33,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class ToLower extends AliasableCypherString<ToLower>
 {
-	private static final String KEYWORD_TO_LOWER = "TOLOWER";
+	private static final String KEYWORD_TO_LOWER = "tolower";
 	
 	private final CypherString cypherString;
 	
