@@ -22,52 +22,52 @@
 
 package com.gregmarut.querybuilder.cypher.function;
 
+import com.gregmarut.querybuilder.cypher.AliasableCypherString;
 import com.gregmarut.querybuilder.cypher.CypherString;
 import com.gregmarut.querybuilder.cypher.QueryBuilderContext;
-import com.gregmarut.querybuilder.cypher.Variable;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
-import javax.annotation.Nullable;
-import java.time.LocalDate;
 import java.util.Map;
 import java.util.stream.Stream;
 
-@NoArgsConstructor
-@AllArgsConstructor
-public class Date extends CypherString
+@RequiredArgsConstructor
+public class Range extends AliasableCypherString<Range>
 {
-	@Nullable
-	private CypherString param;
+	private static final String RANGE = "RANGE";
+	
+	private final CypherString cypherString1;
+	private final CypherString cypherString2;
 	
 	@Override
 	protected String _build(final QueryBuilderContext context)
 	{
-		if (null != param)
-		{
-			return "date(" + param.build(context) + ")";
-		}
-		else
-		{
-			return "date()";
-		}
+		final var sb = new StringBuilder();
+		sb.append(RANGE);
+		sb.append("(");
+		
+		sb.append(cypherString1.build(context));
+		sb.append(", ");
+		sb.append(cypherString2.build(context));
+		
+		sb.append(")");
+		
+		return sb.toString();
 	}
 	
 	@Override
 	public Stream<Map.Entry<String, Object>> getParameterStream(final QueryBuilderContext context)
 	{
-		if (null != param)
-		{
-			return param.getParameterStream(context);
-		}
-		else
-		{
-			return Stream.empty();
-		}
+		return Stream.of(cypherString1.getParameterStream(context), cypherString2.getParameterStream(context)).flatMap(s -> s);
 	}
 	
-	public static Date from(final LocalDate localDate)
+	@Override
+	protected Range getThis()
 	{
-		return new Date(Variable.of(localDate));
+		return this;
+	}
+	
+	public static Range of(final CypherString cypherString1, final CypherString cypherString2)
+	{
+		return new Range(cypherString1, cypherString2);
 	}
 }

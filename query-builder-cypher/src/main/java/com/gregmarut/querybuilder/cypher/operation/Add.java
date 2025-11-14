@@ -20,54 +20,37 @@
  * THE SOFTWARE.
  */
 
-package com.gregmarut.querybuilder.cypher.function;
+package com.gregmarut.querybuilder.cypher.operation;
 
 import com.gregmarut.querybuilder.cypher.CypherString;
 import com.gregmarut.querybuilder.cypher.QueryBuilderContext;
-import com.gregmarut.querybuilder.cypher.Variable;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
-import javax.annotation.Nullable;
-import java.time.LocalDate;
 import java.util.Map;
 import java.util.stream.Stream;
 
-@NoArgsConstructor
-@AllArgsConstructor
-public class Date extends CypherString
+@RequiredArgsConstructor
+public class Add extends CypherString
 {
-	@Nullable
-	private CypherString param;
+	private static final String ADD = "+";
+	
+	private final CypherString left;
+	private final CypherString right;
 	
 	@Override
 	protected String _build(final QueryBuilderContext context)
 	{
-		if (null != param)
-		{
-			return "date(" + param.build(context) + ")";
-		}
-		else
-		{
-			return "date()";
-		}
+		return left.build(context) + " " + ADD + " " + right.build(context);
 	}
 	
 	@Override
 	public Stream<Map.Entry<String, Object>> getParameterStream(final QueryBuilderContext context)
 	{
-		if (null != param)
-		{
-			return param.getParameterStream(context);
-		}
-		else
-		{
-			return Stream.empty();
-		}
+		return Stream.concat(left.getParameterStream(context), right.getParameterStream(context));
 	}
 	
-	public static Date from(final LocalDate localDate)
+	public static Add of(final CypherString left, final CypherString right)
 	{
-		return new Date(Variable.of(localDate));
+		return new Add(left, right);
 	}
 }

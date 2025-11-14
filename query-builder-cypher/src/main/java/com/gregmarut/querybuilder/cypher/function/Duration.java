@@ -22,52 +22,70 @@
 
 package com.gregmarut.querybuilder.cypher.function;
 
+import com.gregmarut.querybuilder.cypher.AliasableCypherString;
 import com.gregmarut.querybuilder.cypher.CypherString;
 import com.gregmarut.querybuilder.cypher.QueryBuilderContext;
-import com.gregmarut.querybuilder.cypher.Variable;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-import javax.annotation.Nullable;
-import java.time.LocalDate;
 import java.util.Map;
 import java.util.stream.Stream;
 
-@NoArgsConstructor
-@AllArgsConstructor
-public class Date extends CypherString
+@RequiredArgsConstructor
+public class Duration extends AliasableCypherString<Duration>
 {
-	@Nullable
-	private CypherString param;
+	private static final String DURATION = "DURATION";
+	
+	private final Map<Unit, CypherString> map;
 	
 	@Override
 	protected String _build(final QueryBuilderContext context)
 	{
-		if (null != param)
-		{
-			return "date(" + param.build(context) + ")";
-		}
-		else
-		{
-			return "date()";
-		}
+		final var sb = new StringBuilder();
+		sb.append(DURATION);
+		sb.append("({");
+		
+		//build the comma separated parameters
+		final var params = map.entrySet().stream().map(entry -> entry.getKey().getKey() + ": " + entry.getValue().build(context)).toList();
+		sb.append(String.join(", ", params));
+		
+		sb.append("})");
+		
+		return sb.toString();
 	}
 	
 	@Override
 	public Stream<Map.Entry<String, Object>> getParameterStream(final QueryBuilderContext context)
 	{
-		if (null != param)
-		{
-			return param.getParameterStream(context);
-		}
-		else
-		{
-			return Stream.empty();
-		}
+		return map.values().stream().flatMap(value -> value.getParameterStream(context));
 	}
 	
-	public static Date from(final LocalDate localDate)
+	@Override
+	protected Duration getThis()
 	{
-		return new Date(Variable.of(localDate));
+		return this;
+	}
+	
+	public static Duration of(final Map<Unit, CypherString> map)
+	{
+		return new Duration(map);
+	}
+	
+	@Getter
+	@RequiredArgsConstructor
+	public enum Unit
+	{
+		YEARS("years"),
+		MONTHS("months"),
+		WEEKS("weeks"),
+		DAYS("days"),
+		HOURS("hours"),
+		MINUTES("minutes"),
+		SECONDS("seconds"),
+		MILLISECONDS("milliseconds"),
+		MICROSECONDS("microseconds"),
+		NANOSECONDS("nanoseconds");
+		
+		private final String key;
 	}
 }
