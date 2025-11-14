@@ -22,6 +22,7 @@
 
 package com.gregmarut.querybuilder.cypher.phrase;
 
+import com.gregmarut.querybuilder.cypher.Alias;
 import com.gregmarut.querybuilder.cypher.AliasedCypherString;
 import com.gregmarut.querybuilder.cypher.Case;
 import com.gregmarut.querybuilder.cypher.CypherString;
@@ -46,24 +47,25 @@ public class Unwind<E extends CypherString> extends CypherPhrase
 	private static final String KEYWORD_UNWIND = "UNWIND";
 	
 	private final List<E> cypherStrings;
-	private final String alias;
+	private final Alias alias;
 	
 	public Unwind(final E cypherStrings, final String alias)
 	{
 		this.cypherStrings = List.of(cypherStrings);
-		this.alias = alias;
+		this.alias = Alias.of(alias);
 	}
 	
 	public Unwind(final List<E> cypherStrings, final String alias)
 	{
 		this.cypherStrings = cypherStrings;
-		this.alias = alias;
+		this.alias = Alias.of(alias);
 	}
 	
 	@Override
 	protected String _build(final QueryBuilderContext context)
 	{
-		return KEYWORD_UNWIND + " " + cypherStrings.stream().map(c -> c.build(context)).collect(Collectors.joining(" + ")) + " AS " + alias;
+		return KEYWORD_UNWIND + " " + cypherStrings.stream().map(c -> c.build(context)).collect(Collectors.joining(" + ")) + " AS " +
+			   alias.build(context);
 	}
 	
 	@Override
@@ -74,7 +76,7 @@ public class Unwind<E extends CypherString> extends CypherPhrase
 	
 	public <N> TypedNode<N> getAsNode(final Class<N> nodeClass)
 	{
-		return new TypedNode<>(nodeClass, NodeType.YIELDED_NODE, alias)
+		return new TypedNode<>(nodeClass, NodeType.YIELDED_NODE, alias.getAlias())
 		{
 			@Override
 			public boolean isBuilt(final QueryBuilderContext context)
