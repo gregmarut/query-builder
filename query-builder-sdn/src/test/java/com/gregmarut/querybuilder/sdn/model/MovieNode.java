@@ -47,6 +47,12 @@ public class MovieNode extends BaseNode
 	private Integer released;
 	private String tagline;
 	
+	public MovieNode(final String id, final String title)
+	{
+		this.id = id;
+		this.title = title;
+	}
+	
 	@Relationship(value = Relationships.IN_GENRE, direction = Relationship.Direction.OUTGOING)
 	private List<GenreNode> genres;
 }
