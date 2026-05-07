@@ -17,14 +17,13 @@
 
 package com.gregmarut.querybuilder.sdn.proxy;
 
-import com.gregmarut.querybuilder.sdn.model.UserNode;
+import com.gregmarut.querybuilder.sdn.model.PersonNode;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 
@@ -33,7 +32,7 @@ class NodeProxyTest
 	@Test
 	void fieldTracking1()
 	{
-		final var entityNode = new UserNode();
+		final var entityNode = new PersonNode();
 		final var proxy = NodeProxy.createProxy(entityNode);
 		
 		proxy.setName("Greg");
@@ -49,31 +48,31 @@ class NodeProxyTest
 	@Test
 	void fieldTracking2()
 	{
-		final var entityNode = new UserNode();
+		final var entityNode = new PersonNode();
 		entityNode.setId("123");
 		entityNode.setName("John");
-		entityNode.setUpdated(Instant.now());
+		entityNode.setBorn(1988);
 		
 		final var proxy = NodeProxy.createProxy(entityNode);
 		
 		proxy.setName("Jonathan");
-		proxy.setUpdated(null);
+		proxy.setBorn(null);
 		Assertions.assertEquals("Jonathan", proxy.getName());
-		Assertions.assertNull(proxy.getUpdated());
+		Assertions.assertNull(proxy.getBorn());
 		
 		final var accessor = NodeProxyAccessor.extract(proxy);
 		final var changedFields = new ArrayList<>(accessor.getChangedFields());
 		changedFields.sort(Comparator.comparing(Field::getName));
 		Assertions.assertEquals(2, changedFields.size());
-		Assertions.assertEquals("name", changedFields.get(0).getName());
-		Assertions.assertEquals("updated", changedFields.get(1).getName());
+		Assertions.assertEquals("born", changedFields.get(0).getName());
+		Assertions.assertEquals("name", changedFields.get(1).getName());
 	}
 	
 	@Test
 	@SneakyThrows
 	void snapshotFieldTransient()
 	{
-		final var entityNode = new UserNode();
+		final var entityNode = new PersonNode();
 		entityNode.setId("123");
 		
 		final var proxy = NodeProxy.createProxy(entityNode);
@@ -85,7 +84,7 @@ class NodeProxyTest
 	@Test
 	void verifyProxyClassesEqual()
 	{
-		final var entityNode = new UserNode();
+		final var entityNode = new PersonNode();
 		final var proxy1 = NodeProxy.createProxy(entityNode);
 		final var proxy2 = NodeProxy.createProxy(entityNode);
 		
@@ -95,10 +94,10 @@ class NodeProxyTest
 	@Test
 	void verifyProxiesAreEqual()
 	{
-		final var entityNode1 = new UserNode();
+		final var entityNode1 = new PersonNode();
 		entityNode1.setId("123");
 		
-		final var entityNode2 = new UserNode();
+		final var entityNode2 = new PersonNode();
 		entityNode2.setId("123");
 		
 		Assertions.assertEquals(entityNode1, entityNode2);
@@ -113,7 +112,7 @@ class NodeProxyTest
 	@Test
 	void equalsProxyAndNonProxyObjects1()
 	{
-		final var entityNode = new UserNode();
+		final var entityNode = new PersonNode();
 		entityNode.setId("123");
 		
 		final var proxy = NodeProxy.createProxy(entityNode);
@@ -125,7 +124,7 @@ class NodeProxyTest
 	@Test
 	void equalsProxyAndNonProxyObjects2()
 	{
-		final var entityNode = new UserNode();
+		final var entityNode = new PersonNode();
 		entityNode.setId("123");
 		
 		final var proxy = NodeProxy.createProxy(entityNode);

@@ -12,83 +12,83 @@ public class OrderBySkipLimitTest
 	{
 		QueryBuilderContext.defaultPrettyPrint = true;
 	}
-
+	
 	@Test
 	public void orderByAsc()
 	{
 		final var identifierGenerator = new IdentifierGenerator();
-
+		
 		final var personNode = new PersonNode()
 			.named(identifierGenerator);
-
+		
 		final var query = CypherBuilder.create()
 			.match(personNode)
 			.addReturn(personNode)
 			.orderBy(personNode.getProperty(PersonNode.NAME))
 			.build();
-
+		
 		Assertions.assertEquals("""
 			MATCH (p:Person)
 			RETURN p
 			ORDER BY p.name ASC""", query.getQuery());
-
+		
 		Assertions.assertTrue(query.getParams().isEmpty());
 	}
-
+	
 	@Test
 	public void orderByDesc()
 	{
 		final var identifierGenerator = new IdentifierGenerator();
-
+		
 		final var personNode = new PersonNode()
 			.named(identifierGenerator);
-
+		
 		final var query = CypherBuilder.create()
 			.match(personNode)
 			.addReturn(personNode)
 			.orderBy(personNode.getProperty(PersonNode.NAME), OrderType.DESC)
 			.build();
-
+		
 		Assertions.assertEquals("""
 			MATCH (p:Person)
 			RETURN p
 			ORDER BY p.name DESC""", query.getQuery());
-
+		
 		Assertions.assertTrue(query.getParams().isEmpty());
 	}
-
+	
 	@Test
 	public void skipAndLimit()
 	{
 		final var identifierGenerator = new IdentifierGenerator();
-
+		
 		final var personNode = new PersonNode()
 			.named(identifierGenerator);
-
+		
 		final var query = CypherBuilder.create()
 			.match(personNode)
 			.addReturn(personNode)
 			.skip(10)
 			.limit(25)
 			.build();
-
+		
 		Assertions.assertEquals("""
 			MATCH (p:Person)
 			RETURN p
 			SKIP 10
 			LIMIT 25""", query.getQuery());
-
+		
 		Assertions.assertTrue(query.getParams().isEmpty());
 	}
-
+	
 	@Test
 	public void orderByWithSkipAndLimit()
 	{
 		final var identifierGenerator = new IdentifierGenerator();
-
+		
 		final var personNode = new PersonNode()
 			.named(identifierGenerator);
-
+		
 		final var query = CypherBuilder.create()
 			.match(personNode)
 			.addReturn(personNode)
@@ -96,14 +96,14 @@ public class OrderBySkipLimitTest
 			.skip(20)
 			.limit(10)
 			.build();
-
+		
 		Assertions.assertEquals("""
 			MATCH (p:Person)
 			RETURN p
 			ORDER BY p.born DESC
 			SKIP 20
 			LIMIT 10""", query.getQuery());
-
+		
 		Assertions.assertTrue(query.getParams().isEmpty());
 	}
 }

@@ -24,6 +24,7 @@ package com.gregmarut.querybuilder.cypher.node;
 
 import com.gregmarut.querybuilder.cypher.CypherBuilder;
 import com.gregmarut.querybuilder.cypher.CypherConstants;
+import com.gregmarut.querybuilder.cypher.CypherString;
 import com.gregmarut.querybuilder.cypher.IdentifierGenerator;
 import com.gregmarut.querybuilder.cypher.Property;
 import com.gregmarut.querybuilder.cypher.QueryBuilderContext;
@@ -116,29 +117,35 @@ public class MutableNode<N> extends LabeledNode<N>
 	{
 		sb.append("{");
 		
-		final var nonNullPropertyValues = properties.entrySet()
+		final var nonNullProperties = properties.entrySet()
 			.stream()
 			.filter(e -> null != e.getValue())
-			.map(Map.Entry::getKey)
 			.toList();
 		
 		//for all of the property keys
 		boolean first = true;
-		for (String propertyName : nonNullPropertyValues)
+		for (var entry : nonNullProperties)
 		{
 			if (!first)
 			{
 				sb.append(", ");
 			}
 			
-			sb.append(propertyName);
+			sb.append(entry.getKey());
 			sb.append(": ");
-			sb.append(CypherBuilder.VARIABLE_PREFIX);
-			sb.append(buildVariable(context, propertyName));
+			
+			if (entry.getValue() instanceof CypherString cs)
+			{
+				sb.append(cs.build(context));
+			}
+			else
+			{
+				sb.append(CypherBuilder.VARIABLE_PREFIX);
+				sb.append(buildVariable(context, entry.getKey()));
+			}
 			
 			first = false;
 		}
-		
 		sb.append("}");
 	}
 }

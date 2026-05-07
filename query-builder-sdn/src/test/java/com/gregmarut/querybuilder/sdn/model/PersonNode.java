@@ -22,23 +22,39 @@
 
 package com.gregmarut.querybuilder.sdn.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
+import org.springframework.data.neo4j.core.schema.Relationship;
 
-import java.time.Instant;
+import java.util.List;
 
 @Getter
 @Setter
-@Node("User")
+@Node("Person")
 @ToString
-public class UserNode extends BaseNode
+@AllArgsConstructor
+@NoArgsConstructor
+public class PersonNode extends BaseNode
 {
 	@Id
 	private String id;
 	private String name;
-	private Instant created;
-	private Instant updated;
+	private Integer born;
+	private String email;
+	
+	public PersonNode(final String id, final String name, final Integer born, final String email)
+	{
+		this.id = id;
+		this.name = name;
+		this.born = born;
+		this.email = email;
+	}
+	
+	@Relationship(value = Relationships.ACTED_IN, direction = Relationship.Direction.OUTGOING)
+	private List<MovieNode> actedInMovies;
 }
