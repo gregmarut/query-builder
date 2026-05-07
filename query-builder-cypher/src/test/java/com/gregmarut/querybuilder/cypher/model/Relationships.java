@@ -20,47 +20,38 @@
  * THE SOFTWARE.
  */
 
-package com.gregmarut.querybuilder.cypher;
+package com.gregmarut.querybuilder.cypher.model;
 
-import lombok.Getter;
-
-import java.util.Collections;
-import java.util.Map;
-import java.util.Objects;
-
-@Getter
-public class CypherQuery
+public class Relationships
 {
-	private final String query;
-	private final Map<String, Object> params;
-	
-	public CypherQuery(final String query, final Map<String, Object> params)
-	{
-		this.query = query.trim();
-		this.params = Collections.unmodifiableMap(params);
-	}
-	
-	@Override
-	public String toString()
-	{
-		return getQuery();
-	}
-	
-	@Override
-	public boolean equals(Object obj)
-	{
-		if (obj == this)
-			return true;
-		if (obj == null || obj.getClass() != this.getClass())
-			return false;
-		var that = (CypherQuery) obj;
-		return Objects.equals(this.query, that.query) &&
-			   Objects.equals(this.params, that.params);
-	}
-	
-	@Override
-	public int hashCode()
-	{
-		return Objects.hash(query, params);
-	}
+	/**
+	 * (Person)-[:ACTED_IN {roles: String}]->(Movie)
+	 * Property: roles — the character name(s) the person played
+	 */
+	public static final String ACTED_IN = "ACTED_IN";
+	public static final String ACTED_IN_ROLES = "roles";
+
+	/**
+	 * (Person)-[:DIRECTED]->(Movie)
+	 */
+	public static final String DIRECTED = "DIRECTED";
+
+	/**
+	 * (Person)-[:REVIEWED {rating: Integer, summary: String}]->(Movie)
+	 * Property: rating — score from 1 to 5
+	 * Property: summary — short review text
+	 */
+	public static final String REVIEWED = "REVIEWED";
+	public static final String REVIEWED_RATING = "rating";
+	public static final String REVIEWED_SUMMARY = "summary";
+
+	/**
+	 * (Movie)-[:IN_GENRE]->(Genre)
+	 */
+	public static final String IN_GENRE = "IN_GENRE";
+
+	/**
+	 * (Person)-[:FOLLOWS]->(Person)
+	 */
+	public static final String FOLLOWS = "FOLLOWS";
 }

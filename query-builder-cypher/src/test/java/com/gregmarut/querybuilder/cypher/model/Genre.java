@@ -20,47 +20,15 @@
  * THE SOFTWARE.
  */
 
-package com.gregmarut.querybuilder.cypher;
+package com.gregmarut.querybuilder.cypher.model;
 
 import lombok.Getter;
-
-import java.util.Collections;
-import java.util.Map;
-import java.util.Objects;
+import lombok.Setter;
 
 @Getter
-public class CypherQuery
+@Setter
+public class Genre
 {
-	private final String query;
-	private final Map<String, Object> params;
-	
-	public CypherQuery(final String query, final Map<String, Object> params)
-	{
-		this.query = query.trim();
-		this.params = Collections.unmodifiableMap(params);
-	}
-	
-	@Override
-	public String toString()
-	{
-		return getQuery();
-	}
-	
-	@Override
-	public boolean equals(Object obj)
-	{
-		if (obj == this)
-			return true;
-		if (obj == null || obj.getClass() != this.getClass())
-			return false;
-		var that = (CypherQuery) obj;
-		return Objects.equals(this.query, that.query) &&
-			   Objects.equals(this.params, that.params);
-	}
-	
-	@Override
-	public int hashCode()
-	{
-		return Objects.hash(query, params);
-	}
+	private String id;
+	private String name;
 }

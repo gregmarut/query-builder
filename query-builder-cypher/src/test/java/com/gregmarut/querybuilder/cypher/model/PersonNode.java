@@ -20,47 +20,45 @@
  * THE SOFTWARE.
  */
 
-package com.gregmarut.querybuilder.cypher;
+package com.gregmarut.querybuilder.cypher.model;
 
-import lombok.Getter;
+import com.gregmarut.querybuilder.cypher.node.MutableNode;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Objects;
-
-@Getter
-public class CypherQuery
+public class PersonNode extends MutableNode<Person>
 {
-	private final String query;
-	private final Map<String, Object> params;
-	
-	public CypherQuery(final String query, final Map<String, Object> params)
+	public static final String LABEL = "Person";
+	public static final String ID = "id";
+	public static final String NAME = "name";
+	public static final String BORN = "born";
+	public static final String EMAIL = "email";
+
+	public PersonNode()
 	{
-		this.query = query.trim();
-		this.params = Collections.unmodifiableMap(params);
+		super(Person.class, LABEL);
+		setIdField(ID);
 	}
-	
-	@Override
-	public String toString()
+
+	public PersonNode withId(final String id)
 	{
-		return getQuery();
+		withProperty(ID, id);
+		return this;
 	}
-	
-	@Override
-	public boolean equals(Object obj)
+
+	public PersonNode withName(final String name)
 	{
-		if (obj == this)
-			return true;
-		if (obj == null || obj.getClass() != this.getClass())
-			return false;
-		var that = (CypherQuery) obj;
-		return Objects.equals(this.query, that.query) &&
-			   Objects.equals(this.params, that.params);
+		withProperty(NAME, name);
+		return this;
 	}
-	
-	@Override
-	public int hashCode()
+
+	public PersonNode withBorn(final Integer born)
 	{
-		return Objects.hash(query, params);
+		withProperty(BORN, born);
+		return this;
+	}
+
+	public PersonNode withEmail(final String email)
+	{
+		withProperty(EMAIL, email);
+		return this;
 	}
 }
