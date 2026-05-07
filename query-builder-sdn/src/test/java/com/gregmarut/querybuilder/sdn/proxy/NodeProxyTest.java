@@ -32,8 +32,8 @@ class NodeProxyTest
 	@Test
 	void fieldTracking1()
 	{
-		final var entityNode = new PersonNode();
-		final var proxy = NodeProxy.createProxy(entityNode);
+		final var personNode = new PersonNode();
+		final var proxy = NodeProxy.createProxy(personNode);
 		
 		proxy.setName("Greg");
 		Assertions.assertEquals("Greg", proxy.getName());
@@ -48,12 +48,12 @@ class NodeProxyTest
 	@Test
 	void fieldTracking2()
 	{
-		final var entityNode = new PersonNode();
-		entityNode.setId("123");
-		entityNode.setName("John");
-		entityNode.setBorn(1988);
+		final var personNode = new PersonNode();
+		personNode.setId("123");
+		personNode.setName("John");
+		personNode.setBorn(1988);
 		
-		final var proxy = NodeProxy.createProxy(entityNode);
+		final var proxy = NodeProxy.createProxy(personNode);
 		
 		proxy.setName("Jonathan");
 		proxy.setBorn(null);
@@ -72,10 +72,10 @@ class NodeProxyTest
 	@SneakyThrows
 	void snapshotFieldTransient()
 	{
-		final var entityNode = new PersonNode();
-		entityNode.setId("123");
+		final var personNode = new PersonNode();
+		personNode.setId("123");
 		
-		final var proxy = NodeProxy.createProxy(entityNode);
+		final var proxy = NodeProxy.createProxy(personNode);
 		final var snapshot = NodeProxy.getSnapshotField(proxy);
 		
 		Assertions.assertTrue(Modifier.isTransient(snapshot.getModifiers()));
@@ -84,9 +84,9 @@ class NodeProxyTest
 	@Test
 	void verifyProxyClassesEqual()
 	{
-		final var entityNode = new PersonNode();
-		final var proxy1 = NodeProxy.createProxy(entityNode);
-		final var proxy2 = NodeProxy.createProxy(entityNode);
+		final var personNode = new PersonNode();
+		final var proxy1 = NodeProxy.createProxy(personNode);
+		final var proxy2 = NodeProxy.createProxy(personNode);
 		
 		Assertions.assertEquals(proxy1.getClass(), proxy2.getClass());
 	}
@@ -94,17 +94,17 @@ class NodeProxyTest
 	@Test
 	void verifyProxiesAreEqual()
 	{
-		final var entityNode1 = new PersonNode();
-		entityNode1.setId("123");
+		final var personNode1 = new PersonNode();
+		personNode1.setId("123");
 		
-		final var entityNode2 = new PersonNode();
-		entityNode2.setId("123");
+		final var personNode2 = new PersonNode();
+		personNode2.setId("123");
 		
-		Assertions.assertEquals(entityNode1, entityNode2);
+		Assertions.assertEquals(personNode1, personNode2);
 		
 		//create proxies for both of the objects
-		final var proxy1 = NodeProxy.createProxy(entityNode1);
-		final var proxy2 = NodeProxy.createProxy(entityNode2);
+		final var proxy1 = NodeProxy.createProxy(personNode1);
+		final var proxy2 = NodeProxy.createProxy(personNode2);
 		
 		Assertions.assertEquals(proxy1, proxy2);
 	}
@@ -112,24 +112,24 @@ class NodeProxyTest
 	@Test
 	void equalsProxyAndNonProxyObjects1()
 	{
-		final var entityNode = new PersonNode();
-		entityNode.setId("123");
+		final var personNode = new PersonNode();
+		personNode.setId("123");
 		
-		final var proxy = NodeProxy.createProxy(entityNode);
+		final var proxy = NodeProxy.createProxy(personNode);
 		
-		Assertions.assertEquals(entityNode, proxy);
-		Assertions.assertEquals(proxy, entityNode);
+		Assertions.assertEquals(personNode, proxy);
+		Assertions.assertEquals(proxy, personNode);
 	}
 	
 	@Test
 	void equalsProxyAndNonProxyObjects2()
 	{
-		final var entityNode = new PersonNode();
-		entityNode.setId("123");
+		final var personNode = new PersonNode();
+		personNode.setId("123");
 		
-		final var proxy = NodeProxy.createProxy(entityNode);
+		final var proxy = NodeProxy.createProxy(personNode);
 		
-		Assertions.assertEquals(entityNode, proxy);
-		Assertions.assertEquals(proxy, entityNode);
+		Assertions.assertEquals(personNode, proxy);
+		Assertions.assertEquals(proxy, personNode);
 	}
 }
