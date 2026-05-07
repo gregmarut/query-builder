@@ -92,7 +92,10 @@ public class MutableNode<N> extends LabeledNode<N>
 	{
 		return properties.entrySet()
 			.stream()
+			//make sure the value is not null
 			.filter(e -> null != e.getValue())
+			//do not include cypher string objects
+			.filter(e -> !(e.getValue() instanceof CypherString))
 			.map(e -> Map.entry(buildVariable(context, e.getKey()), e.getValue()));
 	}
 	

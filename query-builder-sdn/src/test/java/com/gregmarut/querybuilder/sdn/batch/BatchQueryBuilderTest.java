@@ -26,14 +26,17 @@ class BatchQueryBuilderTest
 			new PersonNode("3", "Jane", 2002, "jane@example.com")
 		);
 		
-		final var batchMerges = BatchQueryBuilder.buildBatchMergeQueries(personNodes);
+		final var batchMergeQueries = BatchQueryBuilder.buildBatchMergeQueries(personNodes);
 		
-		Assertions.assertEquals(1, batchMerges.size());
+		Assertions.assertEquals(1, batchMergeQueries.size());
+		
+		final var query = batchMergeQueries.getFirst().query();
+		Assertions.assertEquals(1, query.getParams().size());
 		
 		Assertions.assertEquals("""
 			UNWIND $_v0 AS row
 			MERGE (n:Person{id: row.id})
-			SET n += row""", batchMerges.getFirst().query().getQuery());
+			SET n += row""", batchMergeQueries.getFirst().query().getQuery());
 	}
 	
 	@Test
@@ -51,6 +54,9 @@ class BatchQueryBuilderTest
 		
 		Assertions.assertEquals(1, batchLinkQueries.size());
 		Assertions.assertEquals(3, batchLinkQueries.getFirst().batchSize());
+		
+		final var query = batchLinkQueries.getFirst().query();
+		Assertions.assertEquals(1, query.getParams().size());
 		
 		Assertions.assertEquals("""
 			UNWIND $_v0 AS row
