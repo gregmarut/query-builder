@@ -45,7 +45,7 @@ public final class OrderBy extends CypherString
 	@Override
 	protected String _build(final QueryBuilderContext context)
 	{
-		return value + " " + type.toString();
+		return value.build(context) + " " + type;
 	}
 	
 	@Override

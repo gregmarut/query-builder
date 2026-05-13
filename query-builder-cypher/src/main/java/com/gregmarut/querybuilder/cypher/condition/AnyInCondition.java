@@ -24,7 +24,6 @@ package com.gregmarut.querybuilder.cypher.condition;
 
 import com.gregmarut.querybuilder.cypher.Array;
 import com.gregmarut.querybuilder.cypher.CypherString;
-import com.gregmarut.querybuilder.cypher.LiteralCypherString;
 import com.gregmarut.querybuilder.cypher.QueryBuilderContext;
 import lombok.NonNull;
 
@@ -36,43 +35,49 @@ public class AnyInCondition extends Condition
 {
 	private static final String ANY = "ANY";
 	private static final String WHERE = "WHERE";
-	
-	final InCondition inCondition1;
-	final InCondition inCondition2;
-	
+	private static final String IN = " IN ";
+
+	private final CypherString value1;
+	private final CypherString value2;
+
 	public AnyInCondition(@NonNull final CypherString value1, @NonNull final CypherString value2)
 	{
-		final var element = "_element";
-		
-		this.inCondition1 = new InCondition(LiteralCypherString.of(element), value1);
-		this.inCondition2 = new InCondition(LiteralCypherString.of(element), value2);
+		this.value1 = value1;
+		this.value2 = value2;
 	}
-	
+
 	public AnyInCondition(@NonNull final CypherString value1, @NonNull final Collection<? extends CypherString> value2)
 	{
 		this(value1, Array.of(value2));
 	}
-	
+
 	@Override
 	protected String _build(final QueryBuilderContext context)
 	{
-		StringBuilder sb = new StringBuilder();
+		//use a context-generated name so it is unique within this query and consistent across _build and getParameterStream
+		final var element = context.getVariableName(this);
+
+		final var sb = new StringBuilder();
 		sb.append(ANY);
 		sb.append("(");
-		sb.append(inCondition1.build(context));
+		sb.append(element);
+		sb.append(IN);
+		sb.append(value1.build(context));
 		sb.append(" ");
 		sb.append(WHERE);
 		sb.append(" ");
-		sb.append(inCondition2.build(context));
+		sb.append(element);
+		sb.append(IN);
+		sb.append(value2.build(context));
 		sb.append(")");
-		
+
 		return sb.toString();
 	}
-	
+
 	@Override
 	public Stream<Map.Entry<String, Object>> getParameterStream(final QueryBuilderContext context)
 	{
-		return Stream.of(inCondition1.getParameterStream(context), inCondition2.getParameterStream(context))
+		return Stream.of(value1.getParameterStream(context), value2.getParameterStream(context))
 			.flatMap(s -> s);
 	}
 }

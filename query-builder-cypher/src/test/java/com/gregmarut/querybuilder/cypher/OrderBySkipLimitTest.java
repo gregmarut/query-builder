@@ -85,10 +85,10 @@ public class OrderBySkipLimitTest
 	public void orderByWithSkipAndLimit()
 	{
 		final var identifierGenerator = new IdentifierGenerator();
-		
+
 		final var personNode = new PersonNode()
 			.named(identifierGenerator);
-		
+
 		final var query = CypherBuilder.create()
 			.match(personNode)
 			.addReturn(personNode)
@@ -96,14 +96,28 @@ public class OrderBySkipLimitTest
 			.skip(20)
 			.limit(10)
 			.build();
-		
+
 		Assertions.assertEquals("""
 			MATCH (p:Person)
 			RETURN p
 			ORDER BY p.born DESC
 			SKIP 20
 			LIMIT 10""", query.getQuery());
-		
+
 		Assertions.assertTrue(query.getParams().isEmpty());
+	}
+
+	@Test
+	public void orderByBuildsPropertyUsingProvidedContext()
+	{
+		final var identifierGenerator = new IdentifierGenerator();
+		final var personNode = new PersonNode().named(identifierGenerator);
+
+		final var context = QueryBuilderContext.createDefault();
+
+		final var orderBy = new OrderBy(personNode.getProperty(PersonNode.NAME), OrderType.DESC);
+		final var result = orderBy.build(context);
+
+		Assertions.assertEquals("p.name DESC", result);
 	}
 }

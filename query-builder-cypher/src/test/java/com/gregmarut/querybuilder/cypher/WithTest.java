@@ -69,4 +69,20 @@ public class WithTest
 
 		Assertions.assertTrue(query.getParams().isEmpty());
 	}
+
+	@Test
+	public void withParameterizedExpressionIncludesParamsInQuery()
+	{
+		final var identifierGenerator = new IdentifierGenerator();
+		final var personNode = new PersonNode().named(identifierGenerator);
+		final var paramValue = Variable.of("hello");
+
+		final var query = CypherBuilder.create()
+			.match(personNode)
+			.with(new With().add(personNode).add(paramValue, "myAlias"))
+			.addReturn(LiteralCypherString.of("myAlias"))
+			.build();
+
+		Assertions.assertTrue(query.getParams().containsValue("hello"));
+	}
 }

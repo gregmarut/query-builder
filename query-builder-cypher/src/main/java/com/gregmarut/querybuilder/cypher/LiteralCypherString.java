@@ -30,7 +30,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class LiteralCypherString extends ReturnableCypherString
 {
-	public static final LiteralCypherString NULL = new LiteralCypherString(null);
+	public static final LiteralCypherString NULL = new LiteralCypherString("null");
 	
 	private final String string;
 	

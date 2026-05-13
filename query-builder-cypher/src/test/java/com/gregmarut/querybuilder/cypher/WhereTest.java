@@ -1,11 +1,13 @@
 package com.gregmarut.querybuilder.cypher;
 
+import com.gregmarut.querybuilder.cypher.condition.AnyInCondition;
 import com.gregmarut.querybuilder.cypher.condition.ContainsCondition;
 import com.gregmarut.querybuilder.cypher.condition.EqualsCondition;
 import com.gregmarut.querybuilder.cypher.condition.GreaterThanCondition;
 import com.gregmarut.querybuilder.cypher.condition.NotNullCondition;
 import com.gregmarut.querybuilder.cypher.condition.NullCondition;
 import com.gregmarut.querybuilder.cypher.condition.StartsWithCondition;
+import com.gregmarut.querybuilder.cypher.model.MovieNode;
 import com.gregmarut.querybuilder.cypher.model.PersonNode;
 import com.gregmarut.querybuilder.cypher.phrase.Where;
 import org.junit.jupiter.api.Assertions;
@@ -179,5 +181,22 @@ public class WhereTest
 			RETURN p""", query.getQuery());
 
 		Assertions.assertTrue(query.getParams().isEmpty());
+	}
+
+	@Test
+	public void anyInConditionDoesNotUseHardcodedElementVariable()
+	{
+		final var identifierGenerator = new IdentifierGenerator();
+		final var personNode = new PersonNode().named(identifierGenerator);
+		final var movieNode = new MovieNode().named(identifierGenerator);
+
+		final var cond = new AnyInCondition(
+			personNode.getProperty("tags"),
+			movieNode.getProperty("tags")
+		);
+
+		final var result = cond.build(QueryBuilderContext.createDefault());
+
+		Assertions.assertFalse(result.contains("_element"));
 	}
 }

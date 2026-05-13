@@ -127,6 +127,6 @@ public class With extends CypherPhrase
 	@Override
 	public Stream<Map.Entry<String, Object>> getParameterStream(final QueryBuilderContext context)
 	{
-		return Stream.empty();
+		return cypherStrings.stream().flatMap(cs -> cs.getParameterStream(context));
 	}
 }
