@@ -22,9 +22,9 @@
 
 package com.gregmarut.querybuilder.cypher.function;
 
-import com.gregmarut.querybuilder.cypher.CypherBuilder;
 import com.gregmarut.querybuilder.cypher.CypherString;
 import com.gregmarut.querybuilder.cypher.QueryBuilderContext;
+import com.gregmarut.querybuilder.cypher.Variable;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
@@ -33,36 +33,53 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.stream.Stream;
 
+/**
+ * Renders the cypher {@code datetime()} function. The no-arg constructor renders {@code datetime()},
+ * while the param-accepting form renders {@code datetime($_vN)} with the supplied expression as the
+ * parameter. Mirrors the shape of {@link Date}.
+ */
 @NoArgsConstructor
 @AllArgsConstructor
 public class DateTime extends CypherString
 {
 	@Nullable
-	private Instant dateTime;
-	
+	private CypherString param;
+
 	@Override
 	protected String _build(final QueryBuilderContext context)
 	{
-		if (null != dateTime)
+		if (null != param)
 		{
-			return "datetime(" + CypherBuilder.VARIABLE_PREFIX + context.getVariableName(dateTime) + ")";
+			return "datetime(" + param.build(context) + ")";
 		}
 		else
 		{
 			return "datetime()";
 		}
 	}
-	
+
 	@Override
 	public Stream<Map.Entry<String, Object>> getParameterStream(final QueryBuilderContext context)
 	{
-		if (null != dateTime)
+		if (null != param)
 		{
-			return Map.of(context.getVariableName(dateTime), (Object) dateTime).entrySet().stream();
+			return param.getParameterStream(context);
 		}
 		else
 		{
 			return Stream.empty();
 		}
+	}
+
+	/**
+	 * Convenience factory that wraps the given {@link Instant} as a parameter of the datetime() function.
+	 * Symmetric with {@link Date#from(java.time.LocalDate)}.
+	 *
+	 * @param instant the moment in time to bind as the parameter
+	 * @return a DateTime rendering {@code datetime($_vN)} with {@code instant} as the parameter value
+	 */
+	public static DateTime from(final Instant instant)
+	{
+		return new DateTime(Variable.of(instant));
 	}
 }

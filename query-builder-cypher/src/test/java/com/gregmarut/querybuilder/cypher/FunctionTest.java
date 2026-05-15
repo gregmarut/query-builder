@@ -315,11 +315,11 @@ public class FunctionTest
 	}
 
 	@Test
-	public void dateTimeWithInstant()
+	public void dateTimeFromInstant()
 	{
 		final var context = QueryBuilderContext.createDefault();
 		final var instant = Instant.parse("2025-05-15T12:00:00Z");
-		final var dateTime = new DateTime(instant);
+		final var dateTime = DateTime.from(instant);
 
 		Assertions.assertEquals("datetime($_v0)", dateTime.build(context));
 		final var params = dateTime.getParameterStream(context).toList();
