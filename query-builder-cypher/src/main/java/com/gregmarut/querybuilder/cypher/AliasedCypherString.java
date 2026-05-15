@@ -33,27 +33,41 @@ public class AliasedCypherString<E extends CypherString> extends ReturnableCyphe
 	@Getter
 	private final E cypherString;
 	private final String alias;
-	
+
+	/**
+	 * Constructs an AliasedCypherString and validates the alias against {@link CypherConstants#IDENTIFIER_REGEX}
+	 * so that an invalid identifier surfaces at construction time rather than later at build() time.
+	 *
+	 * @param cypherString the inner expression being aliased
+	 * @param alias        the alias name; must be a valid cypher identifier
+	 * @throws IllegalArgumentException if {@code alias} is null, blank, or not a valid cypher identifier
+	 */
 	public AliasedCypherString(final E cypherString, final String alias)
 	{
+		if (StringUtils.isBlank(alias) || !alias.matches(CypherConstants.IDENTIFIER_REGEX))
+		{
+			throw new IllegalArgumentException("Invalid alias: " + alias);
+		}
+
 		this.cypherString = cypherString;
 		this.alias = alias;
 	}
-	
+
+	/**
+	 * Convenience constructor that allocates the alias from an IdentifierGenerator. Delegates to the
+	 * String-based constructor so the same validation applies.
+	 *
+	 * @param cypherString the inner expression being aliased
+	 * @param generator    the generator used to produce a fresh alias
+	 */
 	public AliasedCypherString(final E cypherString, final IdentifierGenerator generator)
 	{
-		this.cypherString = cypherString;
-		this.alias = generator.next();
+		this(cypherString, generator.next());
 	}
-	
+
 	@Override
 	protected String _build(final QueryBuilderContext context)
 	{
-		if (StringUtils.isBlank(alias))
-		{
-			throw new IllegalArgumentException("Alias cannot be null or empty.");
-		}
-		
 		if (isBuilt(context))
 		{
 			return alias;
