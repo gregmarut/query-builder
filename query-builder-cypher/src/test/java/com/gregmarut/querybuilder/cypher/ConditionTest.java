@@ -233,6 +233,30 @@ public class ConditionTest
 	}
 
 	@Test
+	public void andConditionFromList()
+	{
+		final var identifierGenerator = new IdentifierGenerator();
+		final var personNode = new PersonNode().named(identifierGenerator);
+
+		//symmetric with OrCondition(List): accept a list of conditions
+		final var conditions = List.of(
+			new EqualsCondition(personNode.getProperty(PersonNode.NAME), "Alice"),
+			new GreaterThanCondition(personNode.getProperty(PersonNode.BORN), 1980)
+		);
+		final var query = CypherBuilder.create()
+			.match(personNode)
+			.where(new AndCondition(conditions))
+			.addReturn(personNode)
+			.build();
+
+		Assertions.assertEquals("""
+			MATCH (p:Person)
+			WHERE (p.name = $_v0 AND p.born > 1980)
+			RETURN p""", query.getQuery());
+		Assertions.assertEquals("Alice", query.getParams().get("_v0"));
+	}
+
+	@Test
 	public void orConditionFromList()
 	{
 		final var identifierGenerator = new IdentifierGenerator();

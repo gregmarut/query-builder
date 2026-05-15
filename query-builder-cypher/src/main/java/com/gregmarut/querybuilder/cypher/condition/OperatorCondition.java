@@ -52,7 +52,7 @@ public abstract class OperatorCondition extends Condition
 		this.value2 = LiteralCypherString.of(value2);
 	}
 	
-	OperatorCondition(@NonNull final CypherString value1, @NonNull final String operator, @NonNull final boolean value2)
+	OperatorCondition(@NonNull final CypherString value1, @NonNull final String operator, final boolean value2)
 	{
 		this.value1 = value1;
 		this.operator = operator;

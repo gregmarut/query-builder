@@ -22,12 +22,25 @@
 
 package com.gregmarut.querybuilder.cypher.condition;
 
+import java.util.List;
+
 public class AndCondition extends MultiCondition
 {
 	public static final String OPERATOR = "AND";
-	
+
 	public AndCondition(final Condition... conditions)
 	{
 		super(OPERATOR, conditions);
+	}
+
+	/**
+	 * Convenience constructor that accepts a list rather than a varargs array. Symmetric with
+	 * {@link OrCondition#OrCondition(List)}.
+	 *
+	 * @param conditions the conditions to AND together
+	 */
+	public AndCondition(final List<? extends Condition> conditions)
+	{
+		this(conditions.toArray(Condition[]::new));
 	}
 }
