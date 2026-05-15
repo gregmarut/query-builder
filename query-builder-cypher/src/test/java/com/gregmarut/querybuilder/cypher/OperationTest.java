@@ -78,16 +78,17 @@ public class OperationTest
 	}
 
 	@Test
-	public void plusAppendsInteger()
+	public void addOperationAgainstPropertyAndLiteral()
 	{
 		final var identifierGenerator = new IdentifierGenerator();
 		final var movieNode = new MovieNode().named(identifierGenerator);
 
 		final var context = QueryBuilderContext.createDefault();
-		final var plus = new Plus(movieNode.getProperty(MovieNode.RELEASED), 5);
+		//property + literal renders without parameter wrapping
+		final var add = Add.of(movieNode.getProperty(MovieNode.RELEASED), LiteralCypherString.of("5"));
 
-		Assertions.assertEquals("m.released + 5", plus.build(context));
-		Assertions.assertEquals(0, plus.getParameterStream(context).count());
+		Assertions.assertEquals("m.released + 5", add.build(context));
+		Assertions.assertEquals(0, add.getParameterStream(context).count());
 	}
 
 	@Test
