@@ -219,6 +219,18 @@ public class CypherBuilder
 		this.cypherPhrases.add(() -> delete);
 		return this;
 	}
+
+	/**
+	 * Appends multiple DELETE phrases in order. Symmetric with {@link #merge(Collection)}.
+	 *
+	 * @param deletes the DELETE phrases to append; order is preserved
+	 * @return this builder
+	 */
+	public CypherBuilder delete(final Collection<Delete> deletes)
+	{
+		deletes.forEach(d -> this.cypherPhrases.add(() -> d));
+		return this;
+	}
 	
 	public CypherBuilder orderBy(final Property property)
 	{

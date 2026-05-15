@@ -22,11 +22,15 @@
 
 package com.gregmarut.querybuilder.cypher;
 
+import com.gregmarut.querybuilder.cypher.model.MovieNode;
 import com.gregmarut.querybuilder.cypher.model.PersonNode;
+import com.gregmarut.querybuilder.cypher.model.Relationships;
 import com.gregmarut.querybuilder.cypher.phrase.Delete;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 public class DeleteTest
 {
@@ -57,6 +61,26 @@ public class DeleteTest
 		Assertions.assertEquals("abc123", query.getParams().get("_v0_id"));
 	}
 	
+	@Test
+	public void deleteCollection()
+	{
+		final var identifierGenerator = new IdentifierGenerator();
+		final var personNode = new PersonNode().named(identifierGenerator);
+		final var movieNode = new MovieNode().named(identifierGenerator);
+
+		//pass multiple DELETE phrases via the Collection overload; they should append in order
+		final var query = CypherBuilder.create()
+			.match(Path.start(personNode).out(Relationships.ACTED_IN).to(movieNode).build())
+			.delete(List.of(Delete.delete(personNode), Delete.delete(movieNode)))
+			.build();
+
+		Assertions.assertEquals("""
+			MATCH (p:Person)-[:ACTED_IN]->(m:Movie)
+			DELETE p
+			DELETE m""", query.getQuery());
+		Assertions.assertTrue(query.getParams().isEmpty());
+	}
+
 	@Test
 	public void detachDelete()
 	{
