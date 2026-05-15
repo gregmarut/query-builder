@@ -86,6 +86,36 @@ public class UnwindTest
 		Assertions.assertEquals(List.of("m1", "m2"), query.getParams().get("_v0"));
 	}
 
+	/**
+	 * Regression for the hidden build-order coupling in {@link Unwind#optional}.
+	 *
+	 * Previously, both the size() check and the THEN branch called build() on the AliasedCypherString,
+	 * which would emit the full "COLLECT(...) AS movies" inside size() when the alias had not been built
+	 * by an upstream WITH first — producing invalid cypher. After the fix, Unwind.optional always
+	 * references the alias by name only, regardless of build order.
+	 */
+	@Test
+	public void unwindOptionalReferencesAliasNameRegardlessOfBuildOrder()
+	{
+		final var identifierGenerator = new IdentifierGenerator();
+		final var movieNode = new MovieNode().named(identifierGenerator);
+
+		final Collect<Node> collected = Collect.<Node>of(movieNode);
+		final var aliased = collected.as("movies");
+
+		//deliberately no upstream WITH that builds the aliased collection
+		final var query = CypherBuilder.create()
+			.unwind(Unwind.optional(aliased, "movie"))
+			.addReturn("movie")
+			.build();
+
+		//the rendered query should not embed the full collect expression — it must reference the alias name only
+		Assertions.assertFalse(query.getQuery().contains("AS movies"),
+			"expected only the alias name, not the embedded expression, in: " + query.getQuery());
+		Assertions.assertTrue(query.getQuery().contains("size(movies)"),
+			"expected size(movies) reference, got: " + query.getQuery());
+	}
+
 	@Test
 	public void unwindOptionalForEmptyOrNonEmptyCollection()
 	{

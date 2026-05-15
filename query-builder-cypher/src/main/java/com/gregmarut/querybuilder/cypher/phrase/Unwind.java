@@ -91,14 +91,24 @@ public class Unwind<E extends CypherString> extends CypherPhrase
 	 * If the size of the collection is greater than zero, it returns the collection.
 	 * Otherwise, it returns a singleton list with a null value.
 	 *
-	 * @param collection The collection to be unwound, wrapped in an AliasedCypherString.
-	 * @param alias      The alias to be used for the unwound elements.
-	 * @return An Unwind instance with the generated UNWIND statement.
+	 * The collection is referenced by its alias name only — callers are expected to have already
+	 * introduced the alias via an upstream WITH (or similar) clause. Embedding the AliasedCypherString
+	 * directly would call build() on it from inside size() and the THEN branch, which would either
+	 * inline the full "COLLECT(...) AS alias" expression (invalid cypher) or fail when the underlying
+	 * nodes had not been built yet.
+	 *
+	 * @param collection the aliased collection to be unwound; its alias is what gets referenced
+	 * @param alias      the alias to be used for the unwound elements
+	 * @return an Unwind instance with the generated UNWIND statement
 	 */
 	public static Unwind<Case> optional(final AliasedCypherString<Collect<Node>> collection, final String alias)
 	{
+		//reference the source collection by its alias name so we do not depend on whether the
+		//AliasedCypherString has been built yet — its alias must already be defined by an upstream clause
+		final var collectionRef = LiteralCypherString.of(collection.getIdentifier());
+
 		final var c = Case.builder()
-			.whenThen(new GreaterThanCondition(Size.of(collection), 0), collection)
+			.whenThen(new GreaterThanCondition(Size.of(collectionRef), 0), collectionRef)
 			.elseReturn(LiteralCypherString.of("[null]"))
 			.build();
 		return new Unwind<>(c, alias);
