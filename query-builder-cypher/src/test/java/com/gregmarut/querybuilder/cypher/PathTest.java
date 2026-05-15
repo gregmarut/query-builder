@@ -177,6 +177,27 @@ public class PathTest
 	}
 
 	@Test
+	public void cyclicalPathDetectedByIdentifierAcrossDistinctInstances()
+	{
+		//two distinct Java instances both named "alice" form a cycle - the existing identity-based
+		//check would miss this, but the identifier-based check should catch it
+		final var p1 = new PersonNode().named("alice");
+		final var p2 = new PersonNode().named("alice");
+		final var movieNode = new MovieNode().named("m1");
+
+		final var path = Path.start(p1)
+			.out(Relationships.ACTED_IN).to(movieNode)
+			.in(Relationships.DIRECTED).to(p2)
+			.build();
+
+		final var builder = CypherBuilder.create()
+			.match(path)
+			.addReturn(p1);
+
+		Assertions.assertThrows(RuntimeException.class, builder::build);
+	}
+
+	@Test
 	public void relationshipNamedRejectsInvalidIdentifier()
 	{
 		final var rel = Relationship.of(Relationships.ACTED_IN);

@@ -74,18 +74,31 @@ public class Path extends Condition
 	@Override
 	protected String _build(final QueryBuilderContext context)
 	{
-		//create a set to track which nodes have been processed to prevent an infinite loop
+		//track both instances and identifiers so we catch both the common case (same Node reused) and
+		//the case where two distinct Java objects share an identifier (which would still produce a cycle
+		//in the rendered cypher)
 		final Set<Node> processedNodes = new HashSet<>();
-		
+		final Set<String> processedIdentifiers = new HashSet<>();
+
 		final var sb = new StringBuilder();
 		sb.append(startNode.build(context));
 		processedNodes.add(startNode);
-		
+		if (null != startNode.getIdentifier())
+		{
+			processedIdentifiers.add(startNode.getIdentifier());
+		}
+
 		//for each of the partial patterns
 		for (PartialPattern pp : partialPatterns)
 		{
-			//make sure this node was not already processed
-			if (processedNodes.add(pp.getEndNode()))
+			final var endNode = pp.getEndNode();
+			final var endIdentifier = endNode.getIdentifier();
+
+			final var newInstance = processedNodes.add(endNode);
+			final var newIdentifier = (null == endIdentifier) || processedIdentifiers.add(endIdentifier);
+
+			//make sure this node was not already processed by either instance identity or by identifier
+			if (newInstance && newIdentifier)
 			{
 				sb.append(pp.build(context));
 			}
@@ -95,7 +108,7 @@ public class Path extends Condition
 				throw new RuntimeException("Cyclical reference detected. Unable to build path.");
 			}
 		}
-		
+
 		return sb.toString();
 	}
 	
