@@ -33,9 +33,9 @@ import java.util.stream.Stream;
 
 public class AnyInCondition extends Condition
 {
-	private static final String ANY = "ANY";
-	private static final String WHERE = "WHERE";
-	private static final String IN = " IN ";
+	private static final String KEYWORD_ANY = "ANY";
+	private static final String KEYWORD_WHERE = "WHERE";
+	private static final String KEYWORD_IN = "IN";
 
 	private final CypherString value1;
 	private final CypherString value2;
@@ -58,16 +58,20 @@ public class AnyInCondition extends Condition
 		final var element = context.getVariableName(this);
 
 		final var sb = new StringBuilder();
-		sb.append(ANY);
+		sb.append(KEYWORD_ANY);
 		sb.append("(");
 		sb.append(element);
-		sb.append(IN);
+		sb.append(" ");
+		sb.append(KEYWORD_IN);
+		sb.append(" ");
 		sb.append(value1.build(context));
 		sb.append(" ");
-		sb.append(WHERE);
+		sb.append(KEYWORD_WHERE);
 		sb.append(" ");
 		sb.append(element);
-		sb.append(IN);
+		sb.append(" ");
+		sb.append(KEYWORD_IN);
+		sb.append(" ");
 		sb.append(value2.build(context));
 		sb.append(")");
 

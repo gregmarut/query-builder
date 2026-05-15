@@ -35,7 +35,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class Coalesce extends AliasableCypherString<Coalesce>
 {
-	private static final String KEYWORD_MAX = "coalesce";
+	private static final String KEYWORD_COALESCE = "coalesce";
 	
 	private final CypherString cypherString;
 	private final CypherString defaultValue;
@@ -43,7 +43,7 @@ public class Coalesce extends AliasableCypherString<Coalesce>
 	@Override
 	protected String _build(final QueryBuilderContext context)
 	{
-		return KEYWORD_MAX + "(" + cypherString.build(context) + ", " + defaultValue.build(context) + ")";
+		return KEYWORD_COALESCE + "(" + cypherString.build(context) + ", " + defaultValue.build(context) + ")";
 	}
 	
 	@Override
