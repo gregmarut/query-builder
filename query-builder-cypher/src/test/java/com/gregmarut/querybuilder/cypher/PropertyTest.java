@@ -62,6 +62,33 @@ public class PropertyTest
 	}
 
 	@Test
+	public void subPropertyRejectsInvalidName()
+	{
+		final var identifierGenerator = new IdentifierGenerator();
+		final var personNode = new PersonNode().named(identifierGenerator);
+		final var address = personNode.getProperty("address");
+
+		//leading digit is invalid
+		Assertions.assertThrows(IllegalArgumentException.class, () -> address.getSubProperty("1bad"));
+		//special characters that would inject into the query are rejected
+		Assertions.assertThrows(IllegalArgumentException.class, () -> address.getSubProperty("city; DROP"));
+		Assertions.assertThrows(IllegalArgumentException.class, () -> address.getSubProperty("has-dash"));
+	}
+
+	@Test
+	public void subPropertyAcceptsValidNames()
+	{
+		final var identifierGenerator = new IdentifierGenerator();
+		final var personNode = new PersonNode().named(identifierGenerator);
+		final var address = personNode.getProperty("address");
+
+		//valid names should not throw
+		Assertions.assertDoesNotThrow(() -> address.getSubProperty("city"));
+		Assertions.assertDoesNotThrow(() -> address.getSubProperty("postal_code"));
+		Assertions.assertDoesNotThrow(() -> address.getSubProperty("line2"));
+	}
+
+	@Test
 	public void equalsAndHashCodeForSameIdentifierAndPropertyName()
 	{
 		final var identifierGenerator = new IdentifierGenerator();

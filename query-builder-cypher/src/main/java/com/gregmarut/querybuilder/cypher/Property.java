@@ -58,8 +58,23 @@ public class Property extends AliasableCypherString<Property>
 		return context.getVariableName(item) + "_" + propertyName;
 	}
 	
+	/**
+	 * Builds a CypherString that references a nested property on this property, rendered as
+	 * {@code identifier.property.subProperty}. The sub-property name is validated against the
+	 * same regex used by the Property constructor so user-supplied input cannot inject
+	 * arbitrary cypher fragments.
+	 *
+	 * @param subPropertyName the nested property name; must match {@link Property#REGEX}
+	 * @return a CypherString that renders the nested property reference
+	 * @throws IllegalArgumentException if {@code subPropertyName} is not a valid cypher property name
+	 */
 	public CypherString getSubProperty(final String subPropertyName)
 	{
+		if (!subPropertyName.matches(Property.REGEX))
+		{
+			throw new IllegalArgumentException("Invalid sub-property name: " + subPropertyName);
+		}
+
 		return new CypherString()
 		{
 			@Override
@@ -67,7 +82,7 @@ public class Property extends AliasableCypherString<Property>
 			{
 				return Property.this.getParameterStream(context);
 			}
-			
+
 			@Override
 			protected String _build(final QueryBuilderContext context)
 			{
