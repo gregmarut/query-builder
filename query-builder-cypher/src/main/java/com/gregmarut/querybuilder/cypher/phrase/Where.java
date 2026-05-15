@@ -26,6 +26,7 @@ import com.gregmarut.querybuilder.cypher.QueryBuilderContext;
 import com.gregmarut.querybuilder.cypher.condition.AndCondition;
 import com.gregmarut.querybuilder.cypher.condition.Condition;
 import com.gregmarut.querybuilder.cypher.condition.OrCondition;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,7 +38,8 @@ import java.util.stream.Stream;
 public class Where extends CypherPhrase
 {
 	public static final String KEYWORD_WHERE = "WHERE";
-	
+
+	@Getter
 	private final List<Condition> conditions;
 	
 	public Where(final Condition... conditions)

@@ -31,15 +31,13 @@ import lombok.Getter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Match extends CypherPhrase
 {
 	private static final String KEYWORD_MATCH = "MATCH";
 	private static final String KEYWORD_OPTIONAL = "OPTIONAL";
-	public static final String KEYWORD_WHERE = "WHERE";
-	
+
 	@Getter
 	private final Path path;
 	private final List<Where> whereClauses;
@@ -99,25 +97,29 @@ public class Match extends CypherPhrase
 	protected String _build(final QueryBuilderContext context)
 	{
 		final var sb = new StringBuilder();
-		
+
 		if (optional)
 		{
 			sb.append(KEYWORD_OPTIONAL);
 			sb.append(" ");
 		}
-		
+
 		sb.append(KEYWORD_MATCH);
 		sb.append(" ");
 		sb.append(path.build(context));
-		
+
 		if (!whereClauses.isEmpty())
 		{
+			//flatten all conditions from every attached Where clause into a single Where so we emit
+			//"WHERE a AND b" rather than "WHERE WHERE a AND WHERE b" — Where.build() already emits the keyword
+			final var allConditions = whereClauses.stream()
+				.flatMap(w -> w.getConditions().stream())
+				.toList();
+
 			sb.append(" ");
-			sb.append(KEYWORD_WHERE);
-			sb.append(" ");
-			sb.append(whereClauses.stream().map(w -> w.build(context)).collect(Collectors.joining(" AND ")));
+			sb.append(new Where(allConditions).build(context));
 		}
-		
+
 		return sb.toString();
 	}
 	
