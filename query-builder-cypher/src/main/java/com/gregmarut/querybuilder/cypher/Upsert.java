@@ -97,6 +97,12 @@ public class Upsert extends CypherPhrase
 			{
 				return LiteralCypherString.NULL;
 			}
+			else if (e.getValue() instanceof CypherString cs)
+			{
+				//embed the cypher expression directly rather than wrapping it in a parameter — a
+				//CypherString could never serialize as a Neo4j parameter value anyway
+				return cs;
+			}
 			else
 			{
 				return Variable.of(e.getValue());
