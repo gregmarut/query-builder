@@ -19,7 +19,8 @@ package com.gregmarut.querybuilder.cypher;
 
 public class CypherConstants
 {
-	public static final String IDENTIFIER_REGEX = "^[a-zA-Z0-9]+$";
+	//cypher identifiers must start with a letter or underscore and may contain letters, digits, and underscores thereafter
+	public static final String IDENTIFIER_REGEX = "^[a-zA-Z_][a-zA-Z0-9_]*$";
 	
 	public static final String FLAG_ID_PROPERTY_ONLY = "id_prop_only";
 }
