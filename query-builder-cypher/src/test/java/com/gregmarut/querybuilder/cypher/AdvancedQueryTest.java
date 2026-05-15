@@ -167,6 +167,51 @@ public class AdvancedQueryTest
 	}
 
 	@Test
+	public void whereOptionalAppendsClauseWhenPresent()
+	{
+		final var identifierGenerator = new IdentifierGenerator();
+		final var personNode = new PersonNode().named(identifierGenerator);
+
+		//WhereBuilder.build() returns Optional<Where>; CypherBuilder.where(Optional) should accept it inline
+		final var whereOpt = Where.builder()
+			.add(new EqualsCondition(personNode.getProperty(PersonNode.NAME), "Alice"))
+			.build();
+
+		final var query = CypherBuilder.create()
+			.match(personNode)
+			.where(whereOpt)
+			.addReturn(personNode)
+			.build();
+
+		Assertions.assertEquals("""
+			MATCH (p:Person)
+			WHERE p.name = $_v0
+			RETURN p""", query.getQuery());
+		Assertions.assertEquals("Alice", query.getParams().get("_v0"));
+	}
+
+	@Test
+	public void whereOptionalIsNoOpWhenEmpty()
+	{
+		final var identifierGenerator = new IdentifierGenerator();
+		final var personNode = new PersonNode().named(identifierGenerator);
+
+		//empty WhereBuilder produces Optional.empty(); CypherBuilder.where should silently skip it
+		final var emptyWhere = Where.builder().build();
+
+		final var query = CypherBuilder.create()
+			.match(personNode)
+			.where(emptyWhere)
+			.addReturn(personNode)
+			.build();
+
+		Assertions.assertEquals("""
+			MATCH (p:Person)
+			RETURN p""", query.getQuery());
+		Assertions.assertTrue(query.getParams().isEmpty());
+	}
+
+	@Test
 	public void inConditionWithStringValuesViaArray()
 	{
 		final var identifierGenerator = new IdentifierGenerator();

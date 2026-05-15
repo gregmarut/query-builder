@@ -45,6 +45,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -161,6 +162,20 @@ public class CypherBuilder
 	public CypherBuilder where(final Where where)
 	{
 		this.cypherPhrases.add(() -> where);
+		return this;
+	}
+
+	/**
+	 * Accepts an optional Where, as returned by {@link Where.WhereBuilder#build()}. If present the
+	 * clause is appended; if empty the call is a no-op, allowing conditionally-built WHERE clauses
+	 * to be chained inline.
+	 *
+	 * @param where the optional WHERE clause; may be empty
+	 * @return this builder
+	 */
+	public CypherBuilder where(final Optional<Where> where)
+	{
+		where.ifPresent(this::where);
 		return this;
 	}
 	
