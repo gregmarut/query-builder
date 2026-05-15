@@ -20,43 +20,63 @@
  * THE SOFTWARE.
  */
 
-package com.gregmarut.querybuilder.cypher;
+package com.gregmarut.querybuilder.cypher.phrase;
 
-import com.gregmarut.querybuilder.cypher.phrase.CypherPhrase;
+import com.gregmarut.querybuilder.cypher.CypherString;
+import com.gregmarut.querybuilder.cypher.Property;
+import com.gregmarut.querybuilder.cypher.QueryBuilderContext;
 
 import java.util.Comparator;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class Set extends CypherPhrase
+/**
+ * Renders a SET clause that assigns property values, e.g. {@code SET n.name = $_v0, n.age = $_v1}.
+ * Property assignments are emitted in alphabetical order by property name for deterministic output.
+ *
+ * Named SetClause (rather than Set) to avoid colliding with {@link java.util.Set} at every call site.
+ */
+public class SetClause extends CypherPhrase
 {
 	private static final String KEYWORD_SET = "SET";
-	
+
 	private final Map<Property, CypherString> properties;
-	
-	public Set(final Map<Property, CypherString> properties)
+
+	/**
+	 * Constructs a SetClause for the given property-to-value assignments.
+	 *
+	 * @param properties the assignments to render; must be non-null and non-empty
+	 * @throws IllegalArgumentException if {@code properties} is null or empty
+	 */
+	public SetClause(final Map<Property, CypherString> properties)
 	{
-		if (properties == null || properties.isEmpty())
+		if (null == properties || properties.isEmpty())
 		{
 			throw new IllegalArgumentException("properties cannot be null or empty");
 		}
-		
+
 		this.properties = properties;
 	}
-	
+
 	@Override
 	public Stream<Map.Entry<String, Object>> getParameterStream(final QueryBuilderContext context)
 	{
 		return properties.values().stream().flatMap(p -> p.getParameterStream(context));
 	}
-	
+
 	@Override
 	protected String _build(final QueryBuilderContext context)
 	{
-		return KEYWORD_SET + " " + getWritePropertySet(context);
+		return SetClause.KEYWORD_SET + " " + getWritePropertySet(context);
 	}
-	
+
+	/**
+	 * Renders the comma-separated property assignments, sorted alphabetically by property name.
+	 *
+	 * @param context the build context
+	 * @return a string like {@code n.born = $_v0, n.name = $_v1}
+	 */
 	private String getWritePropertySet(final QueryBuilderContext context)
 	{
 		return this.properties.entrySet().stream()

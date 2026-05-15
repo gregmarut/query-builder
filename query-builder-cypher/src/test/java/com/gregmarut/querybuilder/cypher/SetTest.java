@@ -23,6 +23,7 @@
 package com.gregmarut.querybuilder.cypher;
 
 import com.gregmarut.querybuilder.cypher.model.PersonNode;
+import com.gregmarut.querybuilder.cypher.phrase.SetClause;
 import com.gregmarut.querybuilder.cypher.phrase.SetMerge;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -53,7 +54,7 @@ public class SetTest
 
 		final var query = CypherBuilder.create()
 			.match(personNode)
-			.set(new Set(properties))
+			.set(new SetClause(properties))
 			.addReturn(personNode)
 			.build();
 
@@ -79,7 +80,7 @@ public class SetTest
 
 		final var query = CypherBuilder.create()
 			.match(personNode)
-			.set(new Set(properties))
+			.set(new SetClause(properties))
 			.addReturn(personNode)
 			.build();
 
@@ -96,13 +97,13 @@ public class SetTest
 	@Test
 	public void setNullPropertiesThrows()
 	{
-		Assertions.assertThrows(IllegalArgumentException.class, () -> new Set(null));
+		Assertions.assertThrows(IllegalArgumentException.class, () -> new SetClause(null));
 	}
 
 	@Test
 	public void setEmptyPropertiesThrows()
 	{
-		Assertions.assertThrows(IllegalArgumentException.class, () -> new Set(Map.of()));
+		Assertions.assertThrows(IllegalArgumentException.class, () -> new SetClause(Map.of()));
 	}
 
 	@Test

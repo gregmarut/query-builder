@@ -24,6 +24,7 @@ package com.gregmarut.querybuilder.cypher;
 
 import com.gregmarut.querybuilder.cypher.node.MutableNode;
 import com.gregmarut.querybuilder.cypher.phrase.CypherPhrase;
+import com.gregmarut.querybuilder.cypher.phrase.SetClause;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -40,7 +41,7 @@ public class Upsert extends CypherPhrase
 	private final Merge merge;
 	
 	@Nullable
-	private final com.gregmarut.querybuilder.cypher.Set set;
+	private final SetClause set;
 	
 	public Upsert(final MutableNode<?> node)
 	{
@@ -90,7 +91,7 @@ public class Upsert extends CypherPhrase
 	}
 	
 	@Nullable
-	private com.gregmarut.querybuilder.cypher.Set toSet(final Stream<Map.Entry<Property, Object>> stream)
+	private SetClause toSet(final Stream<Map.Entry<Property, Object>> stream)
 	{
 		final var properties = stream.collect(Collectors.toMap(Map.Entry::getKey, e -> {
 			if (null == e.getValue())
@@ -115,7 +116,7 @@ public class Upsert extends CypherPhrase
 		}
 		else
 		{
-			return new com.gregmarut.querybuilder.cypher.Set(properties);
+			return new SetClause(properties);
 		}
 	}
 }

@@ -29,6 +29,7 @@ import com.gregmarut.querybuilder.cypher.phrase.Delete;
 import com.gregmarut.querybuilder.cypher.phrase.Match;
 import com.gregmarut.querybuilder.cypher.phrase.Remove;
 import com.gregmarut.querybuilder.cypher.phrase.Return;
+import com.gregmarut.querybuilder.cypher.phrase.SetClause;
 import com.gregmarut.querybuilder.cypher.phrase.SetMerge;
 import com.gregmarut.querybuilder.cypher.phrase.Unwind;
 import com.gregmarut.querybuilder.cypher.phrase.UsingIndex;
@@ -134,7 +135,7 @@ public class CypherBuilder
 		return this;
 	}
 	
-	public CypherBuilder set(final Set set)
+	public CypherBuilder set(final SetClause set)
 	{
 		this.cypherPhrases.add(() -> set);
 		return this;
