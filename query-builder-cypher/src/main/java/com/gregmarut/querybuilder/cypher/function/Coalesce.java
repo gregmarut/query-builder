@@ -54,7 +54,7 @@ public class Coalesce extends AliasableCypherString<Coalesce>
 	
 	public <N> TypedNode<N> getAsNode(final Class<N> nodeClass, final String identifier)
 	{
-		return new TypedNode<N>(nodeClass, NodeType.YIELDED_NODE, identifier)
+		return new TypedNode<>(nodeClass, NodeType.YIELDED_NODE, identifier)
 		{
 			@Override
 			public boolean isBuilt(final QueryBuilderContext context)

@@ -291,7 +291,7 @@ public class CypherBuilder
 	{
 		final var sb = new StringBuilder();
 		
-		final Map<String, Object> params = new HashMap<String, Object>();
+		final Map<String, Object> params = new HashMap<>();
 		
 		//for each of the groups
 		cypherPhrases.stream().map(Supplier::get).filter(Objects::nonNull).forEach(cypherPhrase -> {

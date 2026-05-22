@@ -48,6 +48,7 @@ import org.junit.jupiter.api.Test;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class FunctionTest
@@ -332,7 +333,7 @@ public class FunctionTest
 	public void durationFunction()
 	{
 		//use a stable ordered map to assert a consistent rendering order
-		final var duration = Duration.of(new java.util.LinkedHashMap<Duration.Unit, CypherString>()
+		final var duration = Duration.of(new LinkedHashMap<>()
 		{{
 			put(Duration.Unit.DAYS, Variable.of(7));
 			put(Duration.Unit.HOURS, Variable.of(12));

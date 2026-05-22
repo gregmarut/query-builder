@@ -80,7 +80,7 @@ public class Pattern extends PartialPattern
 	
 	public static PatternBuilder<Pattern> from(final Node startNode)
 	{
-		return new PatternBuilder<Pattern>(startNode, p -> p);
+		return new PatternBuilder<>(startNode, p -> p);
 	}
 	
 	public static class PatternBuilder<R> extends PartialPatternBuilder<R>
