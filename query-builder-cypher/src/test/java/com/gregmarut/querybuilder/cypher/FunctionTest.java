@@ -30,6 +30,7 @@ import com.gregmarut.querybuilder.cypher.function.Date;
 import com.gregmarut.querybuilder.cypher.function.DateTime;
 import com.gregmarut.querybuilder.cypher.function.Duration;
 import com.gregmarut.querybuilder.cypher.function.Exists;
+import com.gregmarut.querybuilder.cypher.function.Head;
 import com.gregmarut.querybuilder.cypher.function.Max;
 import com.gregmarut.querybuilder.cypher.function.Range;
 import com.gregmarut.querybuilder.cypher.function.Size;
@@ -361,6 +362,41 @@ public class FunctionTest
 			MATCH (m:Movie)
 			RETURN COUNT(m) AS total""", query.getQuery());
 		Assertions.assertTrue(query.getParams().isEmpty());
+	}
+
+	@Test
+	public void headFunction()
+	{
+		final var identifierGenerator = new IdentifierGenerator();
+		final var personNode = new PersonNode().named(identifierGenerator);
+		final var movieNode = new MovieNode().named(identifierGenerator);
+
+		//head() of a collected list returns just the first element
+		final var firstTitle = Head.of(Collect.of(movieNode.getProperty(MovieNode.TITLE))).as("firstTitle");
+
+		final var query = CypherBuilder.create()
+			.match(Path.start(personNode).out(Relationships.ACTED_IN).to(movieNode).build())
+			.with(new With().add(personNode).add(firstTitle))
+			.addReturn(personNode, firstTitle)
+			.build();
+
+		Assertions.assertEquals("""
+			MATCH (p:Person)-[:ACTED_IN]->(m:Movie)
+			WITH p, head(COLLECT(m.title)) AS firstTitle
+			RETURN p, firstTitle""", query.getQuery());
+		Assertions.assertTrue(query.getParams().isEmpty());
+	}
+
+	@Test
+	public void headOfFactory()
+	{
+		final var context = QueryBuilderContext.createDefault();
+		final var head = Head.of(Variable.of("hello"));
+
+		Assertions.assertEquals("head($_v0)", head.build(context));
+		final var params = head.getParameterStream(context).toList();
+		Assertions.assertEquals(1, params.size());
+		Assertions.assertEquals("hello", params.get(0).getValue());
 	}
 
 	@Test
