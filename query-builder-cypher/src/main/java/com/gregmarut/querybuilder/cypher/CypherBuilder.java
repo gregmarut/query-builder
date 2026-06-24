@@ -26,6 +26,7 @@ import com.gregmarut.querybuilder.cypher.condition.Condition;
 import com.gregmarut.querybuilder.cypher.node.Node;
 import com.gregmarut.querybuilder.cypher.phrase.CypherPhrase;
 import com.gregmarut.querybuilder.cypher.phrase.Delete;
+import com.gregmarut.querybuilder.cypher.phrase.ForEach;
 import com.gregmarut.querybuilder.cypher.phrase.Match;
 import com.gregmarut.querybuilder.cypher.phrase.Remove;
 import com.gregmarut.querybuilder.cypher.phrase.Return;
@@ -231,7 +232,23 @@ public class CypherBuilder
 		deletes.forEach(d -> this.cypherPhrases.add(() -> d));
 		return this;
 	}
-	
+
+	/**
+	 * Appends a FOREACH clause, e.g. {@code FOREACH (r IN list | DELETE r)}.
+	 * <p>
+	 * Pair with a preceding {@code WITH ..., collect(rel) AS list} to iterate safely over an
+	 * OPTIONAL MATCH result without risking a {@code DELETE null} error when nothing matched.
+	 * </p>
+	 *
+	 * @param forEach the FOREACH phrase to append
+	 * @return this builder
+	 */
+	public CypherBuilder forEach(final ForEach forEach)
+	{
+		this.cypherPhrases.add(() -> forEach);
+		return this;
+	}
+
 	public CypherBuilder orderBy(final Property property)
 	{
 		return orderBy(property, OrderType.ASC);
