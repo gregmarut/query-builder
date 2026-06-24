@@ -63,8 +63,16 @@ public class SDNUtil
 	{
 	}
 	
+	//cache key for isSingularRelationship lookups
+	private record SingularRelationshipKey(Class<? extends BaseNode> nodeClass, String relationshipValue, Relationship.Direction direction)
+	{
+	}
+	
 	//cache the id field for each node class
 	private static final Map<Class<? extends BaseNode>, Field> ID_FIELD_CACHE = new ConcurrentHashMap<>();
+	
+	//cache singular-relationship results to avoid repeated reflection on every batch row
+	private static final Map<SingularRelationshipKey, Boolean> SINGULAR_RELATIONSHIP_CACHE = new ConcurrentHashMap<>();
 	
 	/**
 	 * Returns the {@link Field} annotated with {@link Id} on the class of the given node.
@@ -198,14 +206,15 @@ public class SDNUtil
 	public static boolean isSingularRelationship(final Class<? extends BaseNode> nodeClass, final String relationshipValue,
 		final Relationship.Direction direction)
 	{
-		return ReflectionUtil.getAllDeclaredFields(nodeClass).stream()
-			.filter(field -> {
-				final var annotation = field.getDeclaredAnnotation(Relationship.class);
-				return null != annotation && relationshipValue.equals(annotation.value()) && direction == annotation.direction();
-			})
-			.findFirst()
-			.map(field -> !Collection.class.isAssignableFrom(field.getType()))
-			.orElse(false);
+		return SINGULAR_RELATIONSHIP_CACHE.computeIfAbsent(new SingularRelationshipKey(nodeClass, relationshipValue, direction), k ->
+			ReflectionUtil.getAllDeclaredFields(k.nodeClass()).stream()
+				.filter(field -> {
+					final var annotation = field.getDeclaredAnnotation(Relationship.class);
+					return null != annotation && k.relationshipValue().equals(annotation.value()) && k.direction() == annotation.direction();
+				})
+				.findFirst()
+				.map(field -> !Collection.class.isAssignableFrom(field.getType()))
+				.orElse(false));
 	}
 	
 	/**
