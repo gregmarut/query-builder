@@ -55,4 +55,7 @@ public class MovieNode extends BaseNode
 	
 	@Relationship(value = Relationships.IN_GENRE, direction = Relationship.Direction.OUTGOING)
 	private List<GenreNode> genres;
+
+	@Relationship(value = Relationships.DIRECTED, direction = Relationship.Direction.INCOMING)
+	private PersonNode director;
 }

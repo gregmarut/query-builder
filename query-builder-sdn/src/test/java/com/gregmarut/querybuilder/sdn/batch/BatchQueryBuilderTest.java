@@ -64,4 +64,50 @@ class BatchQueryBuilderTest
 			MATCH (b:Person{id: row.toId})
 			MERGE (b)-[:ACTED_IN]->(a)""", batchLinkQueries.getFirst().query().getQuery());
 	}
+	
+	@Test
+	void linkSingularRelationshipDefaultBehavior()
+	{
+		final var personNode = new PersonNode("1", "Greg", 1989, "greg@example.com");
+
+		final var movie1 = new MovieNode("1", "Movie 1");
+		movie1.setDirector(personNode);
+
+		//default method uses plain MERGE even for singular relationships — no replace semantics
+		final var batchLinkQueries = BatchQueryBuilder.buildBatchLinkQueries(List.of(movie1));
+
+		Assertions.assertEquals(1, batchLinkQueries.size());
+		Assertions.assertEquals("""
+			UNWIND $_v0 AS row
+			MATCH (a:Person{id: row.fromId})
+			MATCH (b:Movie{id: row.toId})
+			MERGE (a)-[:DIRECTED]->(b)""", batchLinkQueries.getFirst().query().getQuery());
+	}
+
+	@Test
+	void linkSingularRelationshipReplaceSemantics()
+	{
+		final var personNode = new PersonNode("1", "Greg", 1989, "greg@example.com");
+
+		final var movie1 = new MovieNode("1", "Movie 1");
+		movie1.setDirector(personNode);
+
+		//replace method removes stale edges before merging for singular relationships
+		final var batchLinkQueries = BatchQueryBuilder.buildBatchReplaceLinkQueries(List.of(movie1));
+
+		Assertions.assertEquals(1, batchLinkQueries.size());
+		Assertions.assertEquals(1, batchLinkQueries.getFirst().batchSize());
+
+		final var query = batchLinkQueries.getFirst().query();
+		Assertions.assertEquals(1, query.getParams().size());
+
+		Assertions.assertEquals("""
+			UNWIND $_v0 AS row
+			MATCH (a:Person{id: row.fromId})
+			MATCH (b:Movie{id: row.toId})
+			OPTIONAL MATCH (_i_1:Person)-[_i_2:DIRECTED]->(b) WHERE _i_1 <> a
+			WITH a, b, COLLECT(_i_2) AS _i_3
+			FOREACH (_i_4 IN _i_3 | DELETE _i_4)
+			MERGE (a)-[:DIRECTED]->(b)""", query.getQuery());
+	}
 }

@@ -53,16 +53,36 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Utility methods for extracting properties, relationships, and metadata from {@link BaseNode} objects.
+ * All methods are static; this class is not meant to be instantiated.
+ */
 public class SDNUtil
 {
+	private SDNUtil()
+	{
+	}
+	
 	//cache the id field for each node class
 	private static final Map<Class<? extends BaseNode>, Field> ID_FIELD_CACHE = new ConcurrentHashMap<>();
 	
+	/**
+	 * Returns the {@link Field} annotated with {@link Id} on the class of the given node.
+	 *
+	 * @param node the node whose id field should be returned
+	 * @return the {@link Field} annotated with {@link Id}
+	 */
 	public static Field getIDField(final BaseNode node)
 	{
 		return getIDField(getOriginalClass(node));
 	}
 	
+	/**
+	 * Returns the {@link Field} annotated with {@link Id} on the given node class.
+	 *
+	 * @param nodeClass the class to inspect
+	 * @return the {@link Field} annotated with {@link Id}
+	 */
 	public static Field getIDField(final Class<? extends BaseNode> nodeClass)
 	{
 		return ID_FIELD_CACHE.computeIfAbsent(nodeClass, c -> ReflectionUtil.getAllDeclaredFields(c).stream()
@@ -89,7 +109,7 @@ public class SDNUtil
 	 * considered modified.
 	 *
 	 * @param node the {@link BaseNode} object from which to extract the properties
-	 * @return
+	 * @return a {@link Map} containing the modified properties of the {@code node}
 	 */
 	public static Map<String, Object> extractModifiedProperties(final BaseNode node)
 	{
@@ -113,7 +133,7 @@ public class SDNUtil
 	 * non-null relationship fields will be considered modified.
 	 *
 	 * @param node the {@link BaseNode} object from which to extract the properties
-	 * @return
+	 * @return a list of {@link RelationshipField} representing the modified relationships of the {@code node}
 	 */
 	public static List<RelationshipField<BaseNode>> extractModifiedRelationships(final BaseNode node)
 	{
@@ -136,7 +156,9 @@ public class SDNUtil
 	 * Extracts the non-null properties from the given {@link BaseNode} object and returns them as a {@link Map}. Fields annotated with
 	 * {@link Relationship} are ignored.
 	 *
-	 * @param node the {@link BaseNode} object from which to extract the properties
+	 * @param node            the {@link BaseNode} object from which to extract the properties
+	 * @param fields          the set of fields to inspect on the node
+	 * @param allowNullValues if {@code true}, fields with {@code null} values are included in the result
 	 * @return a {@link Map} containing the non-null properties of the {@code node}
 	 */
 	public static Map<String, Object> extractProperties(final BaseNode node, final Set<Field> fields, final boolean allowNullValues)
@@ -158,6 +180,32 @@ public class SDNUtil
 			.forEach(e -> properties.put(e.getKey(), e.getValue()));
 		
 		return properties;
+	}
+	
+	/**
+	 * Determines whether the {@link Relationship}-annotated field on the given node class that matches the specified relationship
+	 * value and direction is singular (not a {@link Collection}).
+	 * <p>
+	 * Singular relationships have replace semantics: when batch-linking, any existing edge that differs from the new target
+	 * must be removed before the MERGE is applied, otherwise multiple edges accumulate over time.
+	 * </p>
+	 *
+	 * @param nodeClass         the class that declares the {@link Relationship} field
+	 * @param relationshipValue the {@link Relationship#value()} to match
+	 * @param direction         the {@link Relationship.Direction} to match
+	 * @return {@code true} if the matching field is not a {@link Collection}; {@code false} if it is a collection or no matching field exists
+	 */
+	public static boolean isSingularRelationship(final Class<? extends BaseNode> nodeClass, final String relationshipValue,
+		final Relationship.Direction direction)
+	{
+		return ReflectionUtil.getAllDeclaredFields(nodeClass).stream()
+			.filter(field -> {
+				final var annotation = field.getDeclaredAnnotation(Relationship.class);
+				return null != annotation && relationshipValue.equals(annotation.value()) && direction == annotation.direction();
+			})
+			.findFirst()
+			.map(field -> !Collection.class.isAssignableFrom(field.getType()))
+			.orElse(false);
 	}
 	
 	/**
@@ -197,6 +245,7 @@ public class SDNUtil
 	 *
 	 * @param node               the {@link SDNNode} object as the source of the pattern
 	 * @param relationshipFields a collection of {@link RelationshipField} objects representing the relationships of the {@code node}
+	 * @param generator          the {@link IdentifierGenerator} used to produce unique aliases for end nodes
 	 * @return a list of {@link Path} objects representing the paths formed by the {@code node} and its relationships
 	 */
 	public static List<Path> toPaths(final SDNNode<?> node, final Collection<RelationshipField<BaseNode>> relationshipFields,
@@ -310,6 +359,11 @@ public class SDNUtil
 		}
 	}
 	
+	/**
+	 * Holds a resolved {@link Relationship} annotation together with its target node and any relationship properties.
+	 *
+	 * @param <V> the type of the target node
+	 */
 	@Getter
 	public static final class RelationshipField<V>
 	{
@@ -317,11 +371,24 @@ public class SDNUtil
 		private final V target;
 		private final Map<String, Object> properties;
 		
+		/**
+		 * Constructs a {@link RelationshipField} with no extra relationship properties.
+		 *
+		 * @param annotation the {@link Relationship} annotation that describes the edge type and direction
+		 * @param target     the target node at the other end of the relationship
+		 */
 		public RelationshipField(final Relationship annotation, final V target)
 		{
 			this(annotation, target, Map.of());
 		}
 		
+		/**
+		 * Constructs a {@link RelationshipField} with additional relationship properties.
+		 *
+		 * @param annotation the {@link Relationship} annotation that describes the edge type and direction
+		 * @param target     the target node at the other end of the relationship
+		 * @param properties the properties to set on the relationship edge
+		 */
 		public RelationshipField(final Relationship annotation, final V target, final Map<String, Object> properties)
 		{
 			this.annotation = annotation;
